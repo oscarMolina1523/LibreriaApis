@@ -1,0 +1,96 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{B258E011-F33A-4C59-9027-7EE6EAA99451}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Domain.Endpoint</RootNamespace>
+    <AssemblyName>Domain.Endpoint</AssemblyName>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Entities\AuditableEntity.cs" />
+    <Compile Include="Entities\BaseEntity.cs" />
+    <Compile Include="Entities\CategoriaDTO.cs" />
+    <Compile Include="Entities\ClienteDTO.cs" />
+    <Compile Include="Entities\DetalleProductoDTO.cs" />
+    <Compile Include="Entities\EmpleadoDTO.cs" />
+    <Compile Include="Entities\MarcaDTO.cs" />
+    <Compile Include="Entities\MaterialDTO.cs" />
+    <Compile Include="Entities\ProductoDTO.cs" />
+    <Compile Include="Entities\ProveedorDTO.cs" />
+    <Compile Include="Entities\RolDTO.cs" />
+    <Compile Include="Entities\UnidadMedidaDTO.cs" />
+    <Compile Include="Entities\UsuarioDTO.cs" />
+    <Compile Include="Interfaces\Repositories\ICategoriaRepository.cs" />
+    <Compile Include="Interfaces\Repositories\IClienteRepository.cs" />
+    <Compile Include="Interfaces\Repositories\IDetalleProductoRepository.cs" />
+    <Compile Include="Interfaces\Repositories\IEmpleadoRepository.cs" />
+    <Compile Include="Interfaces\Repositories\IMarcaRepository.cs" />
+    <Compile Include="Interfaces\Repositories\IMaterialRepository.cs" />
+    <Compile Include="Interfaces\Repositories\IMedidaRepository.cs" />
+    <Compile Include="Interfaces\Repositories\IProductoRepository.cs" />
+    <Compile Include="Interfaces\Repositories\IProveedorRepository.cs" />
+    <Compile Include="Interfaces\Repositories\IRolRepository.cs" />
+    <Compile Include="Interfaces\Repositories\IUsuarioRepository.cs" />
+    <Compile Include="Interfaces\Services\ICategoriaService.cs" />
+    <Compile Include="Interfaces\Services\IClienteService.cs" />
+    <Compile Include="Interfaces\Services\IDetalleService.cs" />
+    <Compile Include="Interfaces\Services\IEmpleadoService.cs" />
+    <Compile Include="Interfaces\Services\IMarcaService.cs" />
+    <Compile Include="Interfaces\Services\IMaterialService.cs" />
+    <Compile Include="Interfaces\Services\IMedidaService.cs" />
+    <Compile Include="Interfaces\Services\IProductoService.cs" />
+    <Compile Include="Interfaces\Services\IProveedorService.cs" />
+    <Compile Include="Interfaces\Services\IRolService.cs" />
+    <Compile Include="Interfaces\Services\IUsuarioService.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Services\CategoriaService.cs" />
+    <Compile Include="Services\ClienteService.cs" />
+    <Compile Include="Services\DetalleService.cs" />
+    <Compile Include="Services\EmpleadoService.cs" />
+    <Compile Include="Services\MarcaService.cs" />
+    <Compile Include="Services\MaterialService.cs" />
+    <Compile Include="Services\MedidaService.cs" />
+    <Compile Include="Services\ProductoService.cs" />
+    <Compile Include="Services\ProveedorService.cs" />
+    <Compile Include="Services\RolService.cs" />
+    <Compile Include="Services\UsuarioService.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Exceptions\" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>
