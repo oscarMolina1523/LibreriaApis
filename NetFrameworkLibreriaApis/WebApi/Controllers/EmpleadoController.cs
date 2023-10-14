@@ -21,6 +21,7 @@ namespace WebApi.Controllers
         public async Task<IHttpActionResult> GetEmpleado()
         {
             List<Empleado> empleado = await _EmpleadoService.GetAll();
+
             return Ok(empleado);
         }
 
@@ -28,6 +29,7 @@ namespace WebApi.Controllers
         public IHttpActionResult GetEmpleadoById(Guid Id)
         {
             Empleado empleado = _EmpleadoService.GetById(Id);
+
             return Ok(empleado);
         }
 
@@ -35,6 +37,7 @@ namespace WebApi.Controllers
         public IHttpActionResult Create(EmpleadoDTO nuevoEmpleado)
         {
             Empleado newEmpleado = _EmpleadoService.CrearEmpleado(nuevoEmpleado);
+
             return Ok(newEmpleado);
         }
 
@@ -42,6 +45,7 @@ namespace WebApi.Controllers
         public IHttpActionResult Eliminar(Guid Id)
         {
             _EmpleadoService.EliminarEmpleado(Id);
+
             return Ok("el empleado ha sido eliminado");
         }
 
@@ -49,6 +53,7 @@ namespace WebApi.Controllers
         public IHttpActionResult modificarEmpleado(Guid Id, EmpleadoDTO nuevosCampos)
         {
             _EmpleadoService.ModificarEmpleado(Id, nuevosCampos);
+
             return Ok("El empleado ha sido modificado");
         }
 

@@ -1,6 +1,6 @@
 ﻿namespace Domain.Endpoint.Dtos
 {
-    public class EmpleadoDTO
+    public class EmpleadoDTO 
     {
         public string Nombres { get; set; }
 

@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace Domain.Endpoint.Interfaces.Repositories
 {
-    public interface IEmpleadoRepository
+    public interface IEmpleadoRepository 
     {
         Task<List<Empleado>> Get();
 
-        Empleado GetById(Guid Id);
+        Empleado GetById(Guid Id); 
 
         void Create(Empleado empleado);
 

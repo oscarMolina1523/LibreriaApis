@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Domain.Endpoint.Interfaces.Services
 {
-    public interface IEmpleadoService
+    public interface IEmpleadoService  
     {
         Task<List<Empleado>> GetAll();
 

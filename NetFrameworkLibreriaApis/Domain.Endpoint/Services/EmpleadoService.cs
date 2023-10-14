@@ -6,11 +6,11 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Domain.Endpoint.Services
+namespace Domain.Endpoint.Services 
 {
     public class EmpleadoService : IEmpleadoService
     {
-        private readonly IEmpleadoRepository _repository;
+        private readonly IEmpleadoRepository _repository; 
 
         public EmpleadoService(IEmpleadoRepository repository)
         {

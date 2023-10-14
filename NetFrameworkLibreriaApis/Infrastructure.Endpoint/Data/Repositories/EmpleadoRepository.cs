@@ -13,7 +13,7 @@ namespace Infrastructure.Endpoint.Data.Repositories
     class EmpleadoRepository : IEmpleadoRepository
     {
 
-        private readonly ISingletonSqlConnection _connectionBuilder;
+        private readonly ISingletonSqlConnection _connectionBuilder;  
 
         public EmpleadoRepository(ISingletonSqlConnection connectionBuilder)
         {
@@ -52,7 +52,7 @@ namespace Infrastructure.Endpoint.Data.Repositories
                 },
                 new SqlParameter() {
                     Direction = ParameterDirection.Input,
-                    ParameterName = "@Telefono",
+                    ParameterName = "@Telefono", 
                     SqlDbType = SqlDbType.NVarChar,
                     Value = empleado.Telefono
                 }

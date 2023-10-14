@@ -1,6 +1,6 @@
 ﻿namespace Domain.Endpoint.Entities
 {
-    public class Empleado : BaseEntity
+    public class Empleado  : BaseEntity
     {
         public string Nombres{ get; set; }
 
