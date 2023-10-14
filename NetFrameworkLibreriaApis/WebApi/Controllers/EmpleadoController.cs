@@ -1,7 +1,9 @@
-﻿using Domain.Endpoint.Entities;
+﻿using Domain.Endpoint.Dtos;
+using Domain.Endpoint.Entities;
 using Domain.Endpoint.Interfaces.Services;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Web.Http;
 
 namespace WebApi.Controllers
@@ -16,23 +18,23 @@ namespace WebApi.Controllers
         }
 
         [HttpGet]
-        public IHttpActionResult GetEmpleado()
+        public async Task<IHttpActionResult> GetEmpleado()
         {
-            List<EmpleadoDTO> empleado = _EmpleadoService.GetAll();
+            List<Empleado> empleado = await _EmpleadoService.GetAll();
             return Ok(empleado);
         }
 
         [HttpGet]
         public IHttpActionResult GetEmpleadoById(Guid Id)
         {
-            EmpleadoDTO empleado = _EmpleadoService.GetById(Id);
+            Empleado empleado = _EmpleadoService.GetById(Id);
             return Ok(empleado);
         }
 
         [HttpPost]
         public IHttpActionResult Create(EmpleadoDTO nuevoEmpleado)
         {
-            EmpleadoDTO newEmpleado = _EmpleadoService.CrearEmpleado(nuevoEmpleado);
+            Empleado newEmpleado = _EmpleadoService.CrearEmpleado(nuevoEmpleado);
             return Ok(newEmpleado);
         }
 
@@ -40,7 +42,7 @@ namespace WebApi.Controllers
         public IHttpActionResult Eliminar(Guid Id)
         {
             _EmpleadoService.EliminarEmpleado(Id);
-            return Ok();
+            return Ok("el empleado ha sido eliminado");
         }
 
         [HttpPut]

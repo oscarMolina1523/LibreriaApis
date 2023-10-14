@@ -44,12 +44,13 @@
     <Compile Include="Dtos\CategoriaDTO.cs" />
     <Compile Include="Dtos\ClienteDTO.cs" />
     <Compile Include="Dtos\DetalleProductoDTO.cs" />
+    <Compile Include="Dtos\EmpleadoDTO.cs" />
     <Compile Include="Entities\AuditableEntity.cs" />
     <Compile Include="Entities\BaseEntity.cs" />
     <Compile Include="Entities\Categoria.cs" />
     <Compile Include="Entities\Cliente.cs" />
     <Compile Include="Entities\DetalleProducto.cs" />
-    <Compile Include="Entities\EmpleadoDTO.cs" />
+    <Compile Include="Entities\Empleado.cs" />
     <Compile Include="Entities\MarcaDTO.cs" />
     <Compile Include="Entities\MaterialDTO.cs" />
     <Compile Include="Entities\ProductoDTO.cs" />

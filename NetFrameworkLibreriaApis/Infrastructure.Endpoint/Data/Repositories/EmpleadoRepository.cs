@@ -2,84 +2,172 @@
 using Domain.Endpoint.Interfaces.Repositories;
 using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
+using System.Data;
 using System.Linq;
+using System.Threading.Tasks;
+using Domain.Endpoint.Dtos;
 
 namespace Infrastructure.Endpoint.Data.Repositories
 {
     class EmpleadoRepository : IEmpleadoRepository
     {
 
-        private readonly List<EmpleadoDTO> DataAlmacenada = new List<EmpleadoDTO>();
+        private readonly ISingletonSqlConnection _connectionBuilder;
 
-        public EmpleadoRepository()
+        public EmpleadoRepository(ISingletonSqlConnection connectionBuilder)
         {
-            
-
-            var empleado1 = new EmpleadoDTO()
-            {
-                Id = Guid.NewGuid(),
-                Nombres = "Jorge Isaac",
-                Apellidos = "Lopez Ruiz",
-                Cedula = "1548-849562-148R",
-                Telefono = "4859-8426"
-            };
-
-            DataAlmacenada.Add(empleado1);
+            _connectionBuilder = connectionBuilder;
         }
 
-        public void Create(EmpleadoDTO empleado)
+        public void Create(Empleado empleado)
         {
-            DataAlmacenada.Add(empleado);
+            string insertQuery = "INSERT INTO EMPLEADO (ID_EMPLEADO,NOMBRES,APELLIDOS, CEDULA, TELEFONO) VALUES(@ID, @Nombres,@Apellidos, @Cedula, @Telefono)";
+            SqlCommand sqlCommand = _connectionBuilder.GetCommand(insertQuery);
+            SqlParameter[] parameters = new SqlParameter[]
+            {
+                new SqlParameter() {
+                    Direction = ParameterDirection.Input,
+                    ParameterName = "@ID",
+                    SqlDbType = SqlDbType.UniqueIdentifier,
+                    Value = empleado.Id
+                },
+                new SqlParameter() {
+                    Direction = ParameterDirection.Input,
+                    ParameterName = "@Nombres",
+                    SqlDbType = SqlDbType.NVarChar,
+                    Value = empleado.Nombres
+                },
+                new SqlParameter() {
+                    Direction = ParameterDirection.Input,
+                    ParameterName = "@Apellidos",
+                    SqlDbType = SqlDbType.NVarChar,
+                    Value = empleado.Apellidos
+                },
+                new SqlParameter() {
+                    Direction = ParameterDirection.Input,
+                    ParameterName = "@Cedula",
+                    SqlDbType = SqlDbType.NVarChar,
+                    Value = empleado.Cedula
+                },
+                new SqlParameter() {
+                    Direction = ParameterDirection.Input,
+                    ParameterName = "@Telefono",
+                    SqlDbType = SqlDbType.NVarChar,
+                    Value = empleado.Telefono
+                }
+            };
+            sqlCommand.Parameters.AddRange(parameters);
+            sqlCommand.ExecuteNonQuery();
         }
 
         public void Eliminar(Guid Id)
         {
-            var empleadoAEliminar = DataAlmacenada.FirstOrDefault(c => c.Id == Id);
-
-            if (empleadoAEliminar != null)
+            string deleteQuery = "DELETE FROM EMPLEADO WHERE ID_EMPLEADO = @EmpleadoId;";
+            SqlCommand sqlCommand = _connectionBuilder.GetCommand(deleteQuery);
+            SqlParameter parameter = new SqlParameter()
             {
-                DataAlmacenada.Remove(empleadoAEliminar);
-            }
-            else
-            {
-                throw new InvalidOperationException("El empleado no existe.");
-            }
+                Direction = ParameterDirection.Input,
+                ParameterName = "@EmpleadoId",
+                SqlDbType = SqlDbType.UniqueIdentifier,
+                Value = Id
+            };
+            sqlCommand.Parameters.Add(parameter);
+            sqlCommand.ExecuteNonQuery();
         }
 
-        public List<EmpleadoDTO> Get()
+        public async Task<List<Empleado>> Get()
         {
-            return DataAlmacenada;
+            string query = "SELECT * FROM EMPLEADO;";
+            DataTable dataTable = await _connectionBuilder.ExecuteQueryCommandAsync(query);
+            List<Empleado> empleado = dataTable.AsEnumerable()
+                .Select(MapEntityFromDataRow)
+                .ToList();
+
+            return empleado;
         }
 
         public void ModificarEmpleado(Guid Id, EmpleadoDTO modificarEmpleado)
         {
-            var empleadoAModificar = DataAlmacenada.FirstOrDefault(c => c.Id == Id);
-            if (empleadoAModificar != null)
+            string updateQuery = "UPDATE EMPLEADO SET NOMBRES = @Nombres,APELLIDOS=@Apellidos, CEDULA = @Cedula, TELEFONO=@Telefono WHERE ID_EMPLEADO = @Id;";
+            SqlCommand sqlCommand = _connectionBuilder.GetCommand(updateQuery);
+            SqlParameter[] parameters = new SqlParameter[]
             {
-                empleadoAModificar.Nombres = modificarEmpleado.Nombres;
-                empleadoAModificar.Apellidos = modificarEmpleado.Apellidos;
-                empleadoAModificar.Cedula = modificarEmpleado.Cedula;
-                empleadoAModificar.Telefono = modificarEmpleado.Telefono;
-            }
-            else
-            {
-                throw new InvalidOperationException("El empleado no existe.");
-            }
+                new SqlParameter() {
+                    Direction = ParameterDirection.Input,
+                    ParameterName = "@Id",
+                    SqlDbType = SqlDbType.UniqueIdentifier,
+                    Value = Id
+                },
+                new SqlParameter() {
+                    Direction = ParameterDirection.Input,
+                    ParameterName = "@Nombres",
+                    SqlDbType = SqlDbType.NVarChar,
+                    Value = modificarEmpleado.Nombres
+                },
+                new SqlParameter() {
+                    Direction = ParameterDirection.Input,
+                    ParameterName = "@Apellidos",
+                    SqlDbType = SqlDbType.NVarChar,
+                    Value = modificarEmpleado.Apellidos
+                },
+                new SqlParameter() {
+                    Direction = ParameterDirection.Input,
+                    ParameterName = "@Cedula",
+                    SqlDbType = SqlDbType.NVarChar,
+                    Value = modificarEmpleado.Cedula
+                },
+                new SqlParameter() {
+                    Direction = ParameterDirection.Input,
+                    ParameterName = "@Telefono",
+                    SqlDbType = SqlDbType.NVarChar,
+                    Value = modificarEmpleado.Telefono
+                },
+            };
+            sqlCommand.Parameters.AddRange(parameters);
+            sqlCommand.ExecuteNonQuery();
         }
 
-        public EmpleadoDTO GetById(Guid Id)
+        public Empleado GetById(Guid Id)
         {
-            var empleadoAMostrar = DataAlmacenada.FirstOrDefault(c => c.Id == Id);
-
-            if (empleadoAMostrar != null)
+            Empleado empleado = null;
+            string getQuery = "SELECT * FROM EMPLEADO WHERE ID_EMPLEADO = @EmpleadoId;";
+            SqlCommand sqlCommand = _connectionBuilder.GetCommand(getQuery);
+            SqlParameter parameter = new SqlParameter()
             {
-                return empleadoAMostrar;
-            }
-            else
+                Direction = ParameterDirection.Input,
+                ParameterName = "@EmpleadoId",
+                SqlDbType = SqlDbType.UniqueIdentifier,
+                Value = Id
+            };
+            sqlCommand.Parameters.Add(parameter);
+            SqlDataReader reader = sqlCommand.ExecuteReader();
+            if (reader.Read())
             {
-                throw new InvalidOperationException("El empleado no existe.");
+                empleado = new Empleado
+                {
+                    Id = reader.GetGuid(reader.GetOrdinal("ID_EMPLEADO")),
+                    Nombres = reader.GetString(reader.GetOrdinal("NOMBRES")),
+                    Apellidos = reader.GetString(reader.GetOrdinal("APELLIDOS")),
+                    Cedula = reader.GetString(reader.GetOrdinal("CEDULA")),
+                    Telefono = reader.GetString(reader.GetOrdinal("TELEFONO")),
+                };
             }
+            reader.Close();
+            return empleado;
 
+        }
+
+        private Empleado MapEntityFromDataRow(DataRow row)
+        {
+            return new Empleado()
+            {
+                Id = _connectionBuilder.GetDataRowValue<Guid>(row, "ID_EMPLEADO"),
+                Nombres = _connectionBuilder.GetDataRowValue<string>(row, "NOMBRES"),
+                Apellidos = _connectionBuilder.GetDataRowValue<string>(row, "APELLIDOS"),
+                Cedula = _connectionBuilder.GetDataRowValue<string>(row, "CEDULA"),
+                Telefono = _connectionBuilder.GetDataRowValue<string>(row, "TELEFONO")
+            };
         }
     }
 }
