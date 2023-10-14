@@ -2,7 +2,7 @@
 
 namespace Domain.Endpoint.Entities
 {
-    public class DetalleProductoDTO:BaseEntity
+    public class DetalleProducto:BaseEntity
     {
         public Guid IdUnidadMedida { get; set; }
 

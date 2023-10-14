@@ -1,7 +1,9 @@
-﻿using Domain.Endpoint.Entities;
+﻿using Domain.Endpoint.Dtos;
+using Domain.Endpoint.Entities;
 using Domain.Endpoint.Interfaces.Services;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Web.Http;
 
 namespace WebApi.Controllers
@@ -16,23 +18,23 @@ namespace WebApi.Controllers
         }
 
         [HttpGet]
-        public IHttpActionResult GetCliente()
+        public async Task<IHttpActionResult> GetCliente()
         {
-            List<ClienteDTO> cliente = _ClienteService.GetAll();
+            List<Cliente> cliente = await _ClienteService.GetAll();
             return Ok(cliente);
         }
 
         [HttpGet]
         public IHttpActionResult GetClienteById(Guid Id)
         {
-            ClienteDTO cliente = _ClienteService.GetById(Id);
+            Cliente cliente = _ClienteService.GetById(Id);
             return Ok(cliente);
         }
 
         [HttpPost]
         public IHttpActionResult Create(ClienteDTO nuevoCliente)
         {
-            ClienteDTO newCliente = _ClienteService.CrearCliente(nuevoCliente);
+            Cliente newCliente = _ClienteService.CrearCliente(nuevoCliente);
             return Ok(newCliente);
         }
 
@@ -40,7 +42,7 @@ namespace WebApi.Controllers
         public IHttpActionResult Eliminar(Guid Id)
         {
             _ClienteService.EliminarCliente(Id);
-            return Ok();
+            return Ok("cliente eliminado");
         }
 
         [HttpPut]

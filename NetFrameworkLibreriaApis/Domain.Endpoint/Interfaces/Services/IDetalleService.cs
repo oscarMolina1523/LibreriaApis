@@ -1,16 +1,18 @@
-﻿using Domain.Endpoint.Entities;
+﻿using Domain.Endpoint.Dtos;
+using Domain.Endpoint.Entities;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Domain.Endpoint.Interfaces.Services
 {
     public interface IDetalleService
     {
-        List<DetalleProductoDTO> GetAll();
+        Task<List<DetalleProducto>> GetAll();
 
-        DetalleProductoDTO GetById(Guid Id);
+        DetalleProducto GetById(Guid Id);
 
-        DetalleProductoDTO CrearDetalle(DetalleProductoDTO nuevoDetalle);
+        DetalleProducto CrearDetalle(DetalleProductoDTO nuevoDetalle);
 
         void EliminarDetalle(Guid Id);
 

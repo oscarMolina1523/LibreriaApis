@@ -1,8 +1,10 @@
-﻿using Domain.Endpoint.Entities;
+﻿using Domain.Endpoint.Dtos;
+using Domain.Endpoint.Entities;
 using Domain.Endpoint.Interfaces.Repositories;
 using Domain.Endpoint.Interfaces.Services;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Domain.Endpoint.Services
 {
@@ -15,9 +17,9 @@ namespace Domain.Endpoint.Services
             _repository = repository;
         }
 
-        public ClienteDTO CrearCliente(ClienteDTO nuevoCliente)
+        public Cliente CrearCliente(ClienteDTO nuevoCliente)
         {
-            ClienteDTO newCliente = new ClienteDTO()
+            Cliente newCliente = new Cliente()
             {
                 Id = Guid.NewGuid(),
                 Nombres = nuevoCliente.Nombres,
@@ -34,7 +36,7 @@ namespace Domain.Endpoint.Services
             _repository.Eliminar(Id);
         }
 
-        public List<ClienteDTO> GetAll()
+        public Task<List<Cliente>> GetAll()
         {
             return _repository.Get();
         }
@@ -44,7 +46,7 @@ namespace Domain.Endpoint.Services
             _repository.ModificarCliente(Id, cambioCliente);
         }
 
-        public ClienteDTO GetById(Guid Id)
+        public Cliente GetById(Guid Id)
         {
             return _repository.GetById(Id);
         }

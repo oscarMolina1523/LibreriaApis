@@ -1,82 +1,159 @@
-﻿using Domain.Endpoint.Entities;
+﻿using Domain.Endpoint.Dtos;
+using Domain.Endpoint.Entities;
 using Domain.Endpoint.Interfaces.Repositories;
 using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Infrastructure.Endpoint.Data.Repositories
 {
     class ClienteRepository : IClienteRepository
     {
-        private readonly List<ClienteDTO> DataAlmacenada = new List<ClienteDTO>();
+        private readonly ISingletonSqlConnection _connectionBuilder;
 
-        public ClienteRepository()
+        public ClienteRepository(ISingletonSqlConnection connectionBuilder)
         {
-            
-
-            var cliente1 = new ClienteDTO()
-            {
-                Id = Guid.NewGuid(),
-                Nombres = "Eduardo Nahum Pichardo",
-                Cedula = "1548-154895-555U",
-                Telefono = "1548-9584"
-            };
-
-            DataAlmacenada.Add(cliente1);
+            _connectionBuilder = connectionBuilder;
         }
 
-        public void Create(ClienteDTO cliente)
+        public void Create(Cliente cliente)
         {
-            DataAlmacenada.Add(cliente);
+            string insertQuery = "INSERT INTO CLIENTE (ID_CLIENTE,NOMBRES, CEDULA, TELEFONO) VALUES(@ID, @Nombres, @Cedula, @Telefono)";
+            SqlCommand sqlCommand = _connectionBuilder.GetCommand(insertQuery);
+            SqlParameter[] parameters = new SqlParameter[]
+            {
+                new SqlParameter() {
+                    Direction = ParameterDirection.Input,
+                    ParameterName = "@ID",
+                    SqlDbType = SqlDbType.UniqueIdentifier,
+                    Value = cliente.Id
+                },
+                new SqlParameter() {
+                    Direction = ParameterDirection.Input,
+                    ParameterName = "@Nombres",
+                    SqlDbType = SqlDbType.NVarChar,
+                    Value = cliente.Nombres
+                },
+                new SqlParameter() {
+                    Direction = ParameterDirection.Input,
+                    ParameterName = "@Cedula",
+                    SqlDbType = SqlDbType.NVarChar,
+                    Value = cliente.Cedula
+                },
+                new SqlParameter() {
+                    Direction = ParameterDirection.Input,
+                    ParameterName = "@Telefono",
+                    SqlDbType = SqlDbType.NVarChar,
+                    Value = cliente.Telefono
+                }
+            };
+            sqlCommand.Parameters.AddRange(parameters);
+            sqlCommand.ExecuteNonQuery();
         }
 
         public void Eliminar(Guid Id)
         {
-            var clienteAEliminar = DataAlmacenada.FirstOrDefault(c => c.Id == Id);
-
-            if (clienteAEliminar != null)
+            string deleteQuery = "DELETE FROM CLIENTE WHERE ID_CLIENTE = @ClienteId;";
+            SqlCommand sqlCommand = _connectionBuilder.GetCommand(deleteQuery);
+            SqlParameter parameter = new SqlParameter()
             {
-                DataAlmacenada.Remove(clienteAEliminar);
-            }
-            else
-            {
-                throw new InvalidOperationException("El cliente no existe.");
-            }
+                Direction = ParameterDirection.Input,
+                ParameterName = "@ClienteId",
+                SqlDbType = SqlDbType.UniqueIdentifier,
+                Value = Id
+            };
+            sqlCommand.Parameters.Add(parameter);
+            sqlCommand.ExecuteNonQuery();
         }
 
-        public List<ClienteDTO> Get()
+        public async Task<List<Cliente>> Get()
         {
-            return DataAlmacenada;
+            string query = "SELECT * FROM CLIENTE;";
+            DataTable dataTable = await _connectionBuilder.ExecuteQueryCommandAsync(query);
+            List<Cliente> cliente = dataTable.AsEnumerable()
+                .Select(MapEntityFromDataRow)
+                .ToList();
+
+            return cliente;
         }
 
         public void ModificarCliente(Guid Id, ClienteDTO modificarCliente)
         {
-            var clienteAModificar = DataAlmacenada.FirstOrDefault(c => c.Id == Id);
-            if (clienteAModificar != null)
+            string updateQuery = "UPDATE CLIENTE SET NOMBRES = @Nombres, CEDULA = @Cedula, TELEFONO=@Telefono WHERE ID_CLIENTE = @Id;";
+            SqlCommand sqlCommand = _connectionBuilder.GetCommand(updateQuery);
+            SqlParameter[] parameters = new SqlParameter[]
             {
-                clienteAModificar.Nombres = modificarCliente.Nombres;
-                clienteAModificar.Cedula = modificarCliente.Cedula;
-                clienteAModificar.Telefono = modificarCliente.Telefono;
-            }
-            else
-            {
-                throw new InvalidOperationException("El cliente no existe.");
-            }
+                new SqlParameter() {
+                    Direction = ParameterDirection.Input,
+                    ParameterName = "@Id",
+                    SqlDbType = SqlDbType.UniqueIdentifier,
+                    Value = Id
+                },
+                new SqlParameter() {
+                    Direction = ParameterDirection.Input,
+                    ParameterName = "@Nombres",
+                    SqlDbType = SqlDbType.NVarChar,
+                    Value = modificarCliente.Nombres
+                },
+                new SqlParameter() {
+                    Direction = ParameterDirection.Input,
+                    ParameterName = "@Cedula",
+                    SqlDbType = SqlDbType.NVarChar,
+                    Value = modificarCliente.Cedula
+                },
+                new SqlParameter() {
+                    Direction = ParameterDirection.Input,
+                    ParameterName = "@Telefono",
+                    SqlDbType = SqlDbType.NVarChar,
+                    Value = modificarCliente.Telefono
+                },
+            };
+            sqlCommand.Parameters.AddRange(parameters);
+            sqlCommand.ExecuteNonQuery();
         }
 
-        public ClienteDTO GetById(Guid Id)
+        public Cliente GetById(Guid Id)
         {
-            var clienteAMostrar = DataAlmacenada.FirstOrDefault(c => c.Id == Id);
-
-            if (clienteAMostrar != null)
+            Cliente cliente = null;
+            string getQuery = "SELECT * FROM CLIENTE WHERE ID_CLIENTE = @ClienteId;";
+            SqlCommand sqlCommand = _connectionBuilder.GetCommand(getQuery);
+            SqlParameter parameter = new SqlParameter()
             {
-                return clienteAMostrar;
-            }
-            else
+                Direction = ParameterDirection.Input,
+                ParameterName = "@ClienteId",
+                SqlDbType = SqlDbType.UniqueIdentifier,
+                Value = Id
+            };
+            sqlCommand.Parameters.Add(parameter);
+            SqlDataReader reader = sqlCommand.ExecuteReader();
+            if (reader.Read())
             {
-                throw new InvalidOperationException("El cliente no existe.");
+                cliente = new Cliente
+                {
+                    Id = reader.GetGuid(reader.GetOrdinal("ID_CLIENTE")),
+                    Nombres = reader.GetString(reader.GetOrdinal("NOMBRES")),
+                    Cedula = reader.GetString(reader.GetOrdinal("CEDULA")),
+                    Telefono = reader.GetString(reader.GetOrdinal("TELEFONO")),
+                };
             }
+            reader.Close();
+            return cliente;
 
+        }
+
+        private Cliente MapEntityFromDataRow(DataRow row)
+        {
+            return new Cliente()
+            {
+                Id = _connectionBuilder.GetDataRowValue<Guid>(row, "ID_CLIENTE"),
+                Nombres= _connectionBuilder.GetDataRowValue<string>(row, "NOMBRES"),
+                Cedula= _connectionBuilder.GetDataRowValue<string>(row, "CEDULA"),
+                Telefono = _connectionBuilder.GetDataRowValue<string>(row, "TELEFONO")
+            };
         }
     }
 }

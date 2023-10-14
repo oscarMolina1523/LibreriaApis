@@ -1,7 +1,9 @@
-﻿using Domain.Endpoint.Entities;
+﻿using Domain.Endpoint.Dtos;
+using Domain.Endpoint.Entities;
 using Domain.Endpoint.Interfaces.Services;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Web.Http;
 
 namespace WebApi.Controllers
@@ -16,23 +18,23 @@ namespace WebApi.Controllers
         }
 
         [HttpGet]
-        public IHttpActionResult GetDetalle()
+        public async Task<IHttpActionResult> GetDetalle()
         {
-            List<DetalleProductoDTO> detalle = _DetalleService.GetAll();
+            List<DetalleProducto> detalle =await _DetalleService.GetAll();
             return Ok(detalle);
         }
 
         [HttpGet]
         public IHttpActionResult GetDetalleById(Guid Id)
         {
-            DetalleProductoDTO detalle = _DetalleService.GetById(Id);
+            DetalleProducto detalle = _DetalleService.GetById(Id);
             return Ok(detalle);
         }
 
         [HttpPost]
         public IHttpActionResult Create(DetalleProductoDTO nuevoDetalle)
         {
-            DetalleProductoDTO newDetalle = _DetalleService.CrearDetalle(nuevoDetalle);
+            DetalleProducto newDetalle = _DetalleService.CrearDetalle(nuevoDetalle);
             return Ok(newDetalle);
         }
 
@@ -40,7 +42,7 @@ namespace WebApi.Controllers
         public IHttpActionResult Eliminar(Guid Id)
         {
             _DetalleService.EliminarDetalle(Id);
-            return Ok();
+            return Ok("El detalle de producto fue eliminado");
         }
 
         [HttpPut]

@@ -1,16 +1,18 @@
-﻿using Domain.Endpoint.Entities;
+﻿using Domain.Endpoint.Dtos;
+using Domain.Endpoint.Entities;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Domain.Endpoint.Interfaces.Services
 {
     public interface IClienteService
     {
-        List<ClienteDTO> GetAll();
+        Task<List<Cliente>> GetAll();
 
-        ClienteDTO GetById(Guid Id);
+        Cliente GetById(Guid Id);
 
-        ClienteDTO CrearCliente(ClienteDTO nuevoCliente);
+        Cliente CrearCliente(ClienteDTO nuevoCliente);
 
         void EliminarCliente(Guid Id);
 

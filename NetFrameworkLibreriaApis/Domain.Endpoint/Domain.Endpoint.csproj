@@ -42,11 +42,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Dtos\CategoriaDTO.cs" />
+    <Compile Include="Dtos\ClienteDTO.cs" />
+    <Compile Include="Dtos\DetalleProductoDTO.cs" />
     <Compile Include="Entities\AuditableEntity.cs" />
     <Compile Include="Entities\BaseEntity.cs" />
     <Compile Include="Entities\Categoria.cs" />
-    <Compile Include="Entities\ClienteDTO.cs" />
-    <Compile Include="Entities\DetalleProductoDTO.cs" />
+    <Compile Include="Entities\Cliente.cs" />
+    <Compile Include="Entities\DetalleProducto.cs" />
     <Compile Include="Entities\EmpleadoDTO.cs" />
     <Compile Include="Entities\MarcaDTO.cs" />
     <Compile Include="Entities\MaterialDTO.cs" />

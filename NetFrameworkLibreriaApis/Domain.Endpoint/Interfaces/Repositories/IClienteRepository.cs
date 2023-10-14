@@ -1,16 +1,18 @@
-﻿using Domain.Endpoint.Entities;
+﻿using Domain.Endpoint.Dtos;
+using Domain.Endpoint.Entities;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Domain.Endpoint.Interfaces.Repositories
 {
     public interface IClienteRepository
     {
-        List<ClienteDTO> Get();
+        Task<List<Cliente>> Get();
 
-        ClienteDTO GetById(Guid Id);
+        Cliente GetById(Guid Id);
 
-        void Create(ClienteDTO cliente);
+        void Create(Cliente cliente);
 
         void Eliminar(Guid Id);
 
