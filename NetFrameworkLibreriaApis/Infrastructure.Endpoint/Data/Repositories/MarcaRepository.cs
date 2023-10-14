@@ -10,13 +10,13 @@ namespace Infrastructure.Endpoint.Data.Repositories
 {
     class MarcaRepository : IMarcaRepository
     {
-        private readonly List<MarcaDTO> DataAlmacenada = new List<MarcaDTO>();
+        private readonly List<Marca> DataAlmacenada = new List<Marca>();
 
         public MarcaRepository()
         {
             
 
-            var marca1 = new MarcaDTO()
+            var marca1 = new Marca()
             {
                 Id = Guid.NewGuid(),
                 DescripcionMarca = "Coca-Cola",
@@ -26,7 +26,7 @@ namespace Infrastructure.Endpoint.Data.Repositories
             DataAlmacenada.Add(marca1);
         }
 
-        public void Create(MarcaDTO marca)
+        public void Create(Marca marca)
         {
             DataAlmacenada.Add(marca);
         }
@@ -45,12 +45,12 @@ namespace Infrastructure.Endpoint.Data.Repositories
             }
         }
 
-        public List<MarcaDTO> Get()
+        public List<Marca> Get()
         {
             return DataAlmacenada;
         }
 
-        public MarcaDTO GetById(Guid Id)
+        public Marca GetById(Guid Id)
         {
             var marcaMostrar = DataAlmacenada.FirstOrDefault(c => c.Id == Id);
 

@@ -14,10 +14,10 @@ namespace Domain.Endpoint.Services
             _repository = repository;
         }
 
-        public MarcaDTO CrearMarca(MarcaDTO nuevaMarca)
+        public Marca CrearMarca(Marca nuevaMarca)
         {
             
-            MarcaDTO newMarca = new MarcaDTO()
+            Marca newMarca = new Marca()
             {
                 Id = Guid.NewGuid(),
                 DescripcionMarca = nuevaMarca.DescripcionMarca,
@@ -33,12 +33,12 @@ namespace Domain.Endpoint.Services
             _repository.Eliminar(Id);
         }
 
-        public List<MarcaDTO> GetAll()
+        public List<Marca> GetAll()
         {
             return _repository.Get();
         }
 
-        public MarcaDTO GetById(Guid Id)
+        public Marca GetById(Guid Id)
         {
             return _repository.GetById(Id);
         }

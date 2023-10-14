@@ -6,11 +6,11 @@ namespace Domain.Endpoint.Interfaces.Services
 {
     public interface IMarcaService
     {
-        List<MarcaDTO> GetAll();
+        List<Marca> GetAll();
 
-        MarcaDTO GetById(Guid Id);
+        Marca GetById(Guid Id);
 
-        MarcaDTO CrearMarca(MarcaDTO nuevaMarca);
+        Marca CrearMarca(Marca nuevaMarca);
 
         void EliminarMarca(Guid Id);
     }

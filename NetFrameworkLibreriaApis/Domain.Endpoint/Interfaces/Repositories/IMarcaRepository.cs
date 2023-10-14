@@ -6,11 +6,11 @@ namespace Domain.Endpoint.Interfaces.Repositories
 {
     public interface IMarcaRepository
     {
-        List<MarcaDTO> Get();
+        List<Marca> Get();
 
-        MarcaDTO GetById(Guid Id);
+        Marca GetById(Guid Id);
 
-        void Create(MarcaDTO marca);
+        void Create(Marca marca);
 
         void Eliminar(Guid Id);
     }
