@@ -41,9 +41,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Dtos\CategoriaDTO.cs" />
     <Compile Include="Entities\AuditableEntity.cs" />
     <Compile Include="Entities\BaseEntity.cs" />
-    <Compile Include="Entities\CategoriaDTO.cs" />
+    <Compile Include="Entities\Categoria.cs" />
     <Compile Include="Entities\ClienteDTO.cs" />
     <Compile Include="Entities\DetalleProductoDTO.cs" />
     <Compile Include="Entities\EmpleadoDTO.cs" />

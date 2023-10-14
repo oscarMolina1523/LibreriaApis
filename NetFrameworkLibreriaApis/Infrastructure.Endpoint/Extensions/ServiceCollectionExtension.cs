@@ -8,17 +8,18 @@ namespace Infrastructure.Endpoint.Extensions
     {
         public static IServiceCollection AddInfrastructureServices(this IServiceCollection services)
         {
-            services.AddSingleton<ICategoriaRepository, CategoriaRepository>();
-            services.AddSingleton<IMarcaRepository, MarcaRepository>();
-            services.AddSingleton<IMedidaRepository, MedidaRepository>();
-            services.AddSingleton<IMaterialRepository, MaterialRepository>();
-            services.AddSingleton<IRolRepository, RolRepository>();
-            services.AddSingleton<IEmpleadoRepository, EmpleadoRepository>();
-            services.AddSingleton<IClienteRepository, ClienteRepository>();
-            services.AddSingleton<IProveedorRepository, ProveedorRepository>();
-            services.AddSingleton<IUsuarioRepository, UsuarioRepository>();
-            services.AddSingleton<IProductoRepository, ProductoRepository>();
-            services.AddSingleton<IDetalleProductoRepository, DetalleProductoRepository>();
+            services.AddScoped<ICategoriaRepository, CategoriaRepository>();
+            services.AddScoped<IMarcaRepository, MarcaRepository>();
+            services.AddScoped<IMedidaRepository, MedidaRepository>();
+            services.AddScoped<IMaterialRepository, MaterialRepository>();
+            services.AddScoped<IRolRepository, RolRepository>();
+            services.AddScoped<IEmpleadoRepository, EmpleadoRepository>();
+            services.AddScoped<IClienteRepository, ClienteRepository>();
+            services.AddScoped<IProveedorRepository, ProveedorRepository>();
+            services.AddScoped<IUsuarioRepository, UsuarioRepository>();
+            services.AddScoped<IProductoRepository, ProductoRepository>();
+            services.AddScoped<IDetalleProductoRepository, DetalleProductoRepository>();
+            services.AddSingleton<ISingletonSqlConnection>(SingletonSqlConnection.GetInstance());
             return services;
         }
     }

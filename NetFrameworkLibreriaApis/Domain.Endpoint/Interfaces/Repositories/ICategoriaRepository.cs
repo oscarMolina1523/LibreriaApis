@@ -1,16 +1,18 @@
-﻿using Domain.Endpoint.Entities;
+﻿using Domain.Endpoint.Dtos;
+using Domain.Endpoint.Entities;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Domain.Endpoint.Interfaces.Repositories
 {
     public interface ICategoriaRepository
     {
-        List<CategoriaDTO> Get();
+        Task<List<Categoria>> Get();
 
-        CategoriaDTO GetById(Guid Id);
+        Categoria GetById(Guid Id);
 
-        void Create(CategoriaDTO categoria);
+        void Create(Categoria categoria);
 
         void Eliminar(Guid Id);
     }

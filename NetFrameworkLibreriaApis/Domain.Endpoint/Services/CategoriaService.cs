@@ -1,8 +1,10 @@
-﻿using Domain.Endpoint.Entities;
+﻿using Domain.Endpoint.Dtos;
+using Domain.Endpoint.Entities;
 using Domain.Endpoint.Interfaces.Repositories;
 using Domain.Endpoint.Interfaces.Services;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Domain.Endpoint.Services
 {
@@ -14,9 +16,9 @@ namespace Domain.Endpoint.Services
             _repository = repository;
         }
 
-        public CategoriaDTO crearCategoria(CategoriaDTO nuevaCategoria)
+        public Categoria crearCategoria(CategoriaDTO nuevaCategoria)
         {
-            CategoriaDTO newCategoria = new CategoriaDTO()
+            Categoria newCategoria = new Categoria()
             {
                 Id = Guid.NewGuid(),
                 Descripcion = nuevaCategoria.Descripcion,
@@ -31,12 +33,12 @@ namespace Domain.Endpoint.Services
             _repository.Eliminar(Id);
         }
 
-        public List<CategoriaDTO> GetAll()
+        public Task<List<Categoria>> GetAll()
         {
-            return _repository.Get();
+            return  _repository.Get();
         }
 
-        public CategoriaDTO GetById(Guid Id)
+        public Categoria GetById(Guid Id)
         {
             return _repository.GetById(Id);
         }

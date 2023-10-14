@@ -3,7 +3,7 @@
 namespace Domain.Endpoint.Entities
 {
 
-    public class CategoriaDTO : BaseEntity
+    public class Categoria : BaseEntity
     {
         public string Descripcion { get; set; }
     }
