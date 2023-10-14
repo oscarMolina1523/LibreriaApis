@@ -1,16 +1,18 @@
-﻿using Domain.Endpoint.Entities;
+﻿using Domain.Endpoint.Dtos;
+using Domain.Endpoint.Entities;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Domain.Endpoint.Interfaces.Services
 {
     public interface IMarcaService
     {
-        List<Marca> GetAll();
+        Task<List<Marca>> GetAll();
 
         Marca GetById(Guid Id);
 
-        Marca CrearMarca(Marca nuevaMarca);
+        Marca CrearMarca(MarcaDTO nuevaMarca);
 
         void EliminarMarca(Guid Id);
     }

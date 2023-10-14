@@ -1,10 +1,12 @@
-﻿using Domain.Endpoint.Entities;
+﻿using Domain.Endpoint.Dtos;
+using Domain.Endpoint.Entities;
 using Domain.Endpoint.Interfaces.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Threading.Tasks;
 using System.Web.Http;
 
 namespace WebApi.Controllers
@@ -19,23 +21,23 @@ namespace WebApi.Controllers
         }
 
         [HttpGet]
-        public IHttpActionResult GetMarca()
+        public async Task<IHttpActionResult> GetMarca()
         {
-            List<MarcaDTO> marca = _MarcaService.GetAll();
+            List<Marca> marca = await _MarcaService.GetAll();
             return Ok(marca);
         }
 
         [HttpGet]
         public IHttpActionResult GetMarcaById(Guid Id)
         {
-            MarcaDTO marca = _MarcaService.GetById(Id);
+            Marca marca = _MarcaService.GetById(Id);
             return Ok(marca);
         }
 
         [HttpPost]
         public IHttpActionResult Create(MarcaDTO nuevaMarca)
         {
-            MarcaDTO newMarca = _MarcaService.CrearMarca(nuevaMarca);
+            Marca newMarca = _MarcaService.CrearMarca(nuevaMarca);
             return Ok(newMarca);
         }
 
@@ -43,7 +45,7 @@ namespace WebApi.Controllers
         public IHttpActionResult Eliminar(Guid Id)
         {
             _MarcaService.EliminarMarca(Id);
-            return Ok();
+            return Ok("la marca ha sido eliminada");
         }
     }
 }

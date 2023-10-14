@@ -1,12 +1,13 @@
 ﻿using Domain.Endpoint.Entities;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Domain.Endpoint.Interfaces.Repositories
 {
     public interface IMarcaRepository
     {
-        List<Marca> Get();
+        Task<List<Marca>> Get();
 
         Marca GetById(Guid Id);
 

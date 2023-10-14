@@ -1,8 +1,10 @@
-﻿using Domain.Endpoint.Entities;
+﻿using Domain.Endpoint.Dtos;
+using Domain.Endpoint.Entities;
 using Domain.Endpoint.Interfaces.Repositories;
 using Domain.Endpoint.Interfaces.Services;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Domain.Endpoint.Services
 {
@@ -14,7 +16,7 @@ namespace Domain.Endpoint.Services
             _repository = repository;
         }
 
-        public Marca CrearMarca(Marca nuevaMarca)
+        public Marca CrearMarca(MarcaDTO nuevaMarca)
         {
             
             Marca newMarca = new Marca()
@@ -33,7 +35,7 @@ namespace Domain.Endpoint.Services
             _repository.Eliminar(Id);
         }
 
-        public List<Marca> GetAll()
+        public Task<List<Marca>> GetAll()
         {
             return _repository.Get();
         }
