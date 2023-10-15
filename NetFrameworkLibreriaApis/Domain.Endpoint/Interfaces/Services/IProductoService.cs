@@ -1,16 +1,18 @@
-﻿using Domain.Endpoint.Entities;
+﻿using Domain.Endpoint.Dtos;
+using Domain.Endpoint.Entities;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Domain.Endpoint.Interfaces.Services
 {
     public interface IProductoService
     {
-        List<ProductoDTO> GetAll();
+        Task<List<Producto>> GetAll();
 
-        ProductoDTO GetById(Guid Id);
+        Producto GetById(Guid Id);
 
-        ProductoDTO CrearProducto(ProductoDTO nuevoProducto);
+        Producto CrearProducto(ProductoDTO nuevoProducto);
 
         void EliminarProducto(Guid Id);
 

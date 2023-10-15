@@ -1,8 +1,10 @@
-﻿using Domain.Endpoint.Entities;
+﻿using Domain.Endpoint.Dtos;
+using Domain.Endpoint.Entities;
 using Domain.Endpoint.Interfaces.Repositories;
 using Domain.Endpoint.Interfaces.Services;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Domain.Endpoint.Services
 {
@@ -15,10 +17,10 @@ namespace Domain.Endpoint.Services
             _repository = repository;
         }
 
-        public ProductoDTO CrearProducto(ProductoDTO nuevoProducto)
+        public Producto CrearProducto(ProductoDTO nuevoProducto)
         {
            
-            ProductoDTO newProducto = new ProductoDTO()
+            Producto newProducto = new Producto()
             {
                 Id = Guid.NewGuid(),
                 DescripcionProducto = nuevoProducto.DescripcionProducto,
@@ -35,7 +37,7 @@ namespace Domain.Endpoint.Services
             _repository.Eliminar(Id);
         }
 
-        public List<ProductoDTO> GetAll()
+        public Task<List<Producto>> GetAll()
         {
             return _repository.Get();
         }
@@ -45,7 +47,7 @@ namespace Domain.Endpoint.Services
             _repository.ModificarProducto(Id, cambioProducto);
         }
 
-        public ProductoDTO GetById(Guid Id)
+        public Producto GetById(Guid Id)
         {
             return _repository.GetById(Id);
         }

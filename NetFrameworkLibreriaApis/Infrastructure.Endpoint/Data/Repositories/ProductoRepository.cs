@@ -2,79 +2,144 @@
 using Domain.Endpoint.Interfaces.Repositories;
 using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
+using System.Data;
 using System.Linq;
+using System.Threading.Tasks;
+using Domain.Endpoint.Dtos;
 
 namespace Infrastructure.Endpoint.Data.Repositories
 {
     public class ProductoRepository : IProductoRepository
     {
-        private readonly List<ProductoDTO> DataAlmacenada = new List<ProductoDTO>();
+        private readonly ISingletonSqlConnection _connectionBuilder;
 
-        public ProductoRepository()
+        public ProductoRepository(ISingletonSqlConnection connectionBuilder)
         {
-            
-
-            var producto1 = new ProductoDTO()
-            {
-                Id = Guid.NewGuid(),
-                DescripcionProducto = "Libro de Matematicas de 4 año",
-                IdCategoria = Guid.NewGuid()
-            };
-
-            DataAlmacenada.Add(producto1);
+            _connectionBuilder = connectionBuilder;
         }
 
-        public void Create(ProductoDTO producto)
+        public void Create(Producto producto)
         {
-            DataAlmacenada.Add(producto);
+            string insertQuery = "INSERT INTO PRODUCTO (ID_PRODUCTO,DESCRIPCION_PRODUCTO,ID_CATEGORIA) VALUES(@ID, @Descripcion, @IdCategoria)";
+            SqlCommand sqlCommand = _connectionBuilder.GetCommand(insertQuery);
+            SqlParameter[] parameters = new SqlParameter[]
+            {
+                new SqlParameter() {
+                    Direction = ParameterDirection.Input,
+                    ParameterName = "@ID",
+                    SqlDbType = SqlDbType.UniqueIdentifier,
+                    Value = producto.Id
+                },
+                new SqlParameter() {
+                    Direction = ParameterDirection.Input,
+                    ParameterName = "@Descripcion",
+                    SqlDbType = SqlDbType.NVarChar,
+                    Value = producto.DescripcionProducto
+                },
+                new SqlParameter() {
+                    Direction = ParameterDirection.Input,
+                    ParameterName = "@IdCategoria",
+                    SqlDbType = SqlDbType.UniqueIdentifier,
+                    Value = producto.IdCategoria
+                }
+            };
+            sqlCommand.Parameters.AddRange(parameters);
+            sqlCommand.ExecuteNonQuery();
         }
 
         public void Eliminar(Guid Id)
         {
-            var productoAEliminar = DataAlmacenada.FirstOrDefault(c => c.Id == Id);
-
-            if (productoAEliminar != null)
+            string deleteQuery = "DELETE FROM PRODUCTO WHERE ID_PRODUCTO = @ProductoId;";
+            SqlCommand sqlCommand = _connectionBuilder.GetCommand(deleteQuery);
+            SqlParameter parameter = new SqlParameter()
             {
-                DataAlmacenada.Remove(productoAEliminar);
-            }
-            else
-            {
-                throw new InvalidOperationException("El producto no existe.");
-            }
+                Direction = ParameterDirection.Input,
+                ParameterName = "@ProductoId",
+                SqlDbType = SqlDbType.UniqueIdentifier,
+                Value = Id
+            };
+            sqlCommand.Parameters.Add(parameter);
+            sqlCommand.ExecuteNonQuery();
         }
 
-        public List<ProductoDTO> Get()
+        public async Task<List<Producto>> Get()
         {
-            return DataAlmacenada;
+            string query = "SELECT * FROM PRODUCTO;";
+            DataTable dataTable = await _connectionBuilder.ExecuteQueryCommandAsync(query);
+            List<Producto> producto = dataTable.AsEnumerable()
+                .Select(MapEntityFromDataRow)
+                .ToList();
+
+            return producto;
         }
 
         public void ModificarProducto(Guid Id, ProductoDTO modificarProducto)
         {
-            var productoAModificar = DataAlmacenada.FirstOrDefault(c => c.Id == Id);
-            if (productoAModificar != null)
+            string updateQuery = "UPDATE PRODUCTO SET DESCRIPCION_PRODUCTO = @Descripcion, ID_CATEGORIA= @IdCategoria WHERE ID_PRODUCTO = @Id;";
+            SqlCommand sqlCommand = _connectionBuilder.GetCommand(updateQuery);
+            SqlParameter[] parameters = new SqlParameter[]
             {
-                productoAModificar.DescripcionProducto = modificarProducto.DescripcionProducto;
-                productoAModificar.IdCategoria = modificarProducto.IdCategoria;
-            }
-            else
-            {
-                throw new InvalidOperationException("El producto no existe.");
-            }
+                new SqlParameter() {
+                    Direction = ParameterDirection.Input,
+                    ParameterName = "@Id",
+                    SqlDbType = SqlDbType.UniqueIdentifier,
+                    Value = Id
+                },
+                new SqlParameter() {
+                    Direction = ParameterDirection.Input,
+                    ParameterName = "@Descripcion",
+                    SqlDbType = SqlDbType.NVarChar,
+                    Value = modificarProducto.DescripcionProducto
+                },
+                new SqlParameter() {
+                    Direction = ParameterDirection.Input,
+                    ParameterName = "@IdCategoria",
+                    SqlDbType = SqlDbType.UniqueIdentifier,
+                    Value = modificarProducto.IdCategoria
+                },
+                
+            };
+            sqlCommand.Parameters.AddRange(parameters);
+            sqlCommand.ExecuteNonQuery();
         }
 
-        public ProductoDTO GetById(Guid Id)
+        public Producto GetById(Guid Id)
         {
-            var productoAMostrar = DataAlmacenada.FirstOrDefault(c => c.Id == Id);
-
-            if (productoAMostrar != null)
+            Producto producto = null;
+            string getQuery = "SELECT * FROM PRODUCTO WHERE ID_PRODUCTO = @ProductoId;";
+            SqlCommand sqlCommand = _connectionBuilder.GetCommand(getQuery);
+            SqlParameter parameter = new SqlParameter()
             {
-                return productoAMostrar;
-            }
-            else
+                Direction = ParameterDirection.Input,
+                ParameterName = "@ProductoId",
+                SqlDbType = SqlDbType.UniqueIdentifier,
+                Value = Id
+            };
+            sqlCommand.Parameters.Add(parameter);
+            SqlDataReader reader = sqlCommand.ExecuteReader();
+            if (reader.Read())
             {
-                throw new InvalidOperationException("El producto no existe.");
+                producto = new Producto
+                {
+                    Id = reader.GetGuid(reader.GetOrdinal("ID_PRODUCTO")),
+                    DescripcionProducto = reader.GetString(reader.GetOrdinal("DESCRIPCION_PRODUCTO")),
+                    IdCategoria = reader.GetGuid(reader.GetOrdinal("ID_CATEGORIA")),
+                };
             }
+            reader.Close();
+            return producto;
 
+        }
+
+        private Producto MapEntityFromDataRow(DataRow row)
+        {
+            return new Producto()
+            {
+                Id = _connectionBuilder.GetDataRowValue<Guid>(row, "ID_PRODUCTO"),
+                DescripcionProducto = _connectionBuilder.GetDataRowValue<string>(row, "DESCRIPCION_PRODUCTO"),
+                IdCategoria = _connectionBuilder.GetDataRowValue<Guid>(row, "ID_CATEGORIA"),
+            };
         }
     }
 }

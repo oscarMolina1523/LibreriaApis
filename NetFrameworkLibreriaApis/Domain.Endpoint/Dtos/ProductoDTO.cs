@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace Domain.Endpoint.Entities
+namespace Domain.Endpoint.Dtos
 {
-    public class ProductoDTO:BaseEntity
+    public class ProductoDTO
     {
         public string DescripcionProducto { get; set; }
 

@@ -1,7 +1,9 @@
-﻿using Domain.Endpoint.Entities;
+﻿using Domain.Endpoint.Dtos;
+using Domain.Endpoint.Entities;
 using Domain.Endpoint.Interfaces.Services;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Web.Http;
 
 namespace WebApi.Controllers
@@ -16,23 +18,23 @@ namespace WebApi.Controllers
         }
 
         [HttpGet]
-        public IHttpActionResult GetProducto()
+        public async Task<IHttpActionResult> GetProducto()
         {
-            List<ProductoDTO> producto = _ProductoService.GetAll();
+            List<Producto> producto = await _ProductoService.GetAll();
             return Ok(producto);
         }
 
         [HttpGet]
         public IHttpActionResult GetProductoById(Guid Id)
         {
-            ProductoDTO producto = _ProductoService.GetById(Id);
+            Producto producto = _ProductoService.GetById(Id);
             return Ok(producto);
         }
 
         [HttpPost]
         public IHttpActionResult Create(ProductoDTO nuevoProducto)
         {
-            ProductoDTO newProducto = _ProductoService.CrearProducto(nuevoProducto);
+            Producto newProducto = _ProductoService.CrearProducto(nuevoProducto);
             return Ok(newProducto);
         }
 
