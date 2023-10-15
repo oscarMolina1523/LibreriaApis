@@ -49,6 +49,7 @@
     <Compile Include="Dtos\MaterialDTO.cs" />
     <Compile Include="Dtos\ProductoDTO.cs" />
     <Compile Include="Dtos\ProveedorDTO.cs" />
+    <Compile Include="Dtos\RolDTO.cs" />
     <Compile Include="Entities\AuditableEntity.cs" />
     <Compile Include="Entities\BaseEntity.cs" />
     <Compile Include="Entities\Categoria.cs" />
@@ -59,7 +60,7 @@
     <Compile Include="Entities\Material.cs" />
     <Compile Include="Entities\Producto.cs" />
     <Compile Include="Entities\Proveedor.cs" />
-    <Compile Include="Entities\RolDTO.cs" />
+    <Compile Include="Entities\Rol.cs" />
     <Compile Include="Entities\UnidadMedidaDTO.cs" />
     <Compile Include="Entities\UsuarioDTO.cs" />
     <Compile Include="Interfaces\Repositories\ICategoriaRepository.cs" />

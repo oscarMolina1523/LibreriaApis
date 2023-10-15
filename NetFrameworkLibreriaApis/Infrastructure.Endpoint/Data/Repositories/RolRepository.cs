@@ -2,65 +2,105 @@
 using Domain.Endpoint.Interfaces.Repositories;
 using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Infrastructure.Endpoint.Data.Repositories
 {
     class RolRepository : IRolRepository
     {
-        private readonly List<RolDTO> DataAlmacenada = new List<RolDTO>();
+        private readonly ISingletonSqlConnection _connectionBuilder;
 
-        public RolRepository()
+        public RolRepository(ISingletonSqlConnection connectionBuilder)
         {
-            
-
-            var rol1 = new RolDTO()
-            {
-                Id = Guid.NewGuid(),
-                DescripcionRol = "Administrador",
-                
-            };
-
-            DataAlmacenada.Add(rol1);
+            _connectionBuilder = connectionBuilder;
         }
 
-        public void Create(RolDTO rol)
+        public void Create(Rol rol)
         {
-            DataAlmacenada.Add(rol);
+            string insertQuery = "INSERT INTO ROLES (ID_ROLES,DESCRIPCION_ROLES) VALUES(@ID, @Descripcion)";
+            SqlCommand sqlCommand = _connectionBuilder.GetCommand(insertQuery);
+            SqlParameter[] parameters = new SqlParameter[]
+            {
+                new SqlParameter() {
+                    Direction = ParameterDirection.Input,
+                    ParameterName = "@ID",
+                    SqlDbType = SqlDbType.UniqueIdentifier,
+                    Value = rol.Id
+                },
+                new SqlParameter() {
+                    Direction = ParameterDirection.Input,
+                    ParameterName = "@Descripcion",
+                    SqlDbType = SqlDbType.NVarChar,
+                    Value = rol.DescripcionRol
+                }
+            };
+            sqlCommand.Parameters.AddRange(parameters);
+            sqlCommand.ExecuteNonQuery();
         }
 
         public void Eliminar(Guid Id)
         {
-            var rolAEliminar = DataAlmacenada.FirstOrDefault(c => c.Id == Id);
-
-            if (rolAEliminar != null)
+            string deleteQuery = "DELETE FROM ROLES WHERE ID_ROLES = @RolesId;";
+            SqlCommand sqlCommand = _connectionBuilder.GetCommand(deleteQuery);
+            SqlParameter parameter = new SqlParameter()
             {
-                DataAlmacenada.Remove(rolAEliminar);
-            }
-            else
-            {
-                throw new InvalidOperationException("La medida no existe.");
-            }
+                Direction = ParameterDirection.Input,
+                ParameterName = "@RolesId",
+                SqlDbType = SqlDbType.UniqueIdentifier,
+                Value = Id
+            };
+            sqlCommand.Parameters.Add(parameter);
+            sqlCommand.ExecuteNonQuery();
         }
 
-        public List<RolDTO> Get()
+        public async Task<List<Rol>> Get()
         {
-            return DataAlmacenada;
+            string query = "SELECT * FROM ROLES;";
+            DataTable dataTable = await _connectionBuilder.ExecuteQueryCommandAsync(query);
+            List<Rol> rol = dataTable.AsEnumerable()
+                .Select(MapEntityFromDataRow)
+                .ToList();
+
+            return rol;
         }
 
-        public RolDTO GetById(Guid Id)
+        public Rol GetById(Guid Id)
         {
-            var rolAMostrar = DataAlmacenada.FirstOrDefault(c => c.Id == Id);
-
-            if (rolAMostrar != null)
+            Rol rol = null;
+            string getQuery = "SELECT * FROM ROLES WHERE ID_ROLES = @RolesId;";
+            SqlCommand sqlCommand = _connectionBuilder.GetCommand(getQuery);
+            SqlParameter parameter = new SqlParameter()
             {
-                return rolAMostrar;
-            }
-            else
+                Direction = ParameterDirection.Input,
+                ParameterName = "@RolesId",
+                SqlDbType = SqlDbType.UniqueIdentifier,
+                Value = Id
+            };
+            sqlCommand.Parameters.Add(parameter);
+            SqlDataReader reader = sqlCommand.ExecuteReader();
+            if (reader.Read())
             {
-                throw new InvalidOperationException("El rol no existe.");
+                rol = new Rol
+                {
+                    Id = reader.GetGuid(reader.GetOrdinal("ID_ROLES")),
+                    DescripcionRol = reader.GetString(reader.GetOrdinal("DESCRIPCION_ROLES")),
+                };
             }
+            reader.Close();
+            return rol;
 
+        }
+
+        private Rol MapEntityFromDataRow(DataRow row)
+        {
+            return new Rol()
+            {
+                Id = _connectionBuilder.GetDataRowValue<Guid>(row, "ID_ROLES"),
+                DescripcionRol = _connectionBuilder.GetDataRowValue<string>(row, "DESCRIPCION_ROLES")
+            };
         }
     }
 }

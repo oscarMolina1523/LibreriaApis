@@ -1,7 +1,9 @@
-﻿using Domain.Endpoint.Entities;
+﻿using Domain.Endpoint.Dtos;
+using Domain.Endpoint.Entities;
 using Domain.Endpoint.Interfaces.Services;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Web.Http;
 
 namespace WebApi.Controllers
@@ -16,23 +18,23 @@ namespace WebApi.Controllers
         }
 
         [HttpGet]
-        public IHttpActionResult GetRol()
+        public async Task<IHttpActionResult> GetRol()
         {
-            List<RolDTO> material = _rolService.GetAll();
+            List<Rol> material = await _rolService.GetAll();
             return Ok(material);
         }
 
         [HttpGet]
         public IHttpActionResult GetRolById(Guid Id)
         {
-            RolDTO rol = _rolService.GetById(Id);
+            Rol rol = _rolService.GetById(Id);
             return Ok(rol);
         }
 
         [HttpPost]
         public IHttpActionResult crearRol(RolDTO nuevoRol)
         {
-            RolDTO newRol = _rolService.CrearRol(nuevoRol);
+            Rol newRol = _rolService.CrearRol(nuevoRol);
             return Ok(newRol);
         }
 

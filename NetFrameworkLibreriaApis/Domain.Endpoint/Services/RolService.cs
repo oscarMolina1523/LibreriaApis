@@ -1,8 +1,10 @@
-﻿using Domain.Endpoint.Entities;
+﻿using Domain.Endpoint.Dtos;
+using Domain.Endpoint.Entities;
 using Domain.Endpoint.Interfaces.Repositories;
 using Domain.Endpoint.Interfaces.Services;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Domain.Endpoint.Services
 {
@@ -15,9 +17,9 @@ namespace Domain.Endpoint.Services
             _repository = repository;
         }
 
-        public RolDTO CrearRol(RolDTO nuevoRol)
+        public Rol CrearRol(RolDTO nuevoRol)
         {
-            RolDTO newRol = new RolDTO()
+            Rol newRol = new Rol()
             {
                 Id = Guid.NewGuid(),
                 DescripcionRol = nuevoRol.DescripcionRol,
@@ -33,12 +35,12 @@ namespace Domain.Endpoint.Services
             _repository.Eliminar(Id);
         }
 
-        public List<RolDTO> GetAll()
+        public Task<List<Rol>> GetAll()
         {
             return _repository.Get();
         }
 
-        public RolDTO GetById(Guid Id)
+        public Rol GetById(Guid Id)
         {
             return _repository.GetById(Id);
         }

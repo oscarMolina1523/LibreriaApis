@@ -1,16 +1,18 @@
-﻿using Domain.Endpoint.Entities;
+﻿using Domain.Endpoint.Dtos;
+using Domain.Endpoint.Entities;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Domain.Endpoint.Interfaces.Services
 {
     public interface IRolService
     {
-        List<RolDTO> GetAll();
+        Task<List<Rol>> GetAll();
 
-        RolDTO GetById(Guid Id);
+        Rol GetById(Guid Id);
 
-        RolDTO CrearRol(RolDTO nuevoRol);
+        Rol CrearRol(RolDTO nuevoRol);
 
         void EliminarRol(Guid Id);
     }

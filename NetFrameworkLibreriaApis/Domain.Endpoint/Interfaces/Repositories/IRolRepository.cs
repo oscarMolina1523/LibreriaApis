@@ -1,16 +1,17 @@
 ﻿using Domain.Endpoint.Entities;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Domain.Endpoint.Interfaces.Repositories
 {
     public interface IRolRepository
     {
-        List<RolDTO> Get();
+        Task<List<Rol>> Get();
 
-        RolDTO GetById(Guid Id);
+        Rol GetById(Guid Id);
 
-        void Create(RolDTO rol);
+        void Create(Rol rol);
 
         void Eliminar(Guid Id);
     }
