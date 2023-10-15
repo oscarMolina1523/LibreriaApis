@@ -1,6 +1,6 @@
 ﻿namespace Domain.Endpoint.Entities
 {
-    public class MaterialDTO: BaseEntity
+    public class Material: BaseEntity
     {
         public string DescripcionMaterial { get; set; }
     }

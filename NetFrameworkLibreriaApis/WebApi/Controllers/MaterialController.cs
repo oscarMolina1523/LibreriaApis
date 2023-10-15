@@ -1,7 +1,9 @@
-﻿using Domain.Endpoint.Entities;
+﻿using Domain.Endpoint.Dtos;
+using Domain.Endpoint.Entities;
 using Domain.Endpoint.Interfaces.Services;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Web.Http;
 
 namespace WebApi.Controllers
@@ -15,23 +17,23 @@ namespace WebApi.Controllers
         }
 
         [HttpGet]
-        public IHttpActionResult GetMaterial()
+        public async Task<IHttpActionResult> GetMaterial()
         {
-            List<MaterialDTO> material = _materialService.GetAll();
+            List<Material> material = await _materialService.GetAll();
             return Ok(material);
         }
 
         [HttpGet]
         public IHttpActionResult GetMaterialById(Guid Id)
         {
-            MaterialDTO material = _materialService.GetById(Id);
+            Material material = _materialService.GetById(Id);
             return Ok(material);
         }
 
         [HttpPost]
         public IHttpActionResult crearMaterial(MaterialDTO nuevoMaterial)
         {
-            MaterialDTO newMaterial = _materialService.CrearMaterial(nuevoMaterial);
+            Material newMaterial = _materialService.CrearMaterial(nuevoMaterial);
             return Ok(newMaterial);
         }
 

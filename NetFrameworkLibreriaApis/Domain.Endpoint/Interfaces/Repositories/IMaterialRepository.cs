@@ -1,16 +1,17 @@
 ﻿using Domain.Endpoint.Entities;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Domain.Endpoint.Interfaces.Repositories
 {
     public interface IMaterialRepository
     {
-        List<MaterialDTO> Get();
+        Task<List<Material>> Get();
 
-        MaterialDTO GetById(Guid Id);
+        Material GetById(Guid Id);
 
-        void Create(MaterialDTO material);
+        void Create(Material material);
 
         void Eliminar(Guid Id);
     }

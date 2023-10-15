@@ -2,65 +2,105 @@
 using Domain.Endpoint.Interfaces.Repositories;
 using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
+using System.Data;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Infrastructure.Endpoint.Data.Repositories
 {
     class MaterialRepository : IMaterialRepository
     {
-        private readonly List<MaterialDTO> DataAlmacenada = new List<MaterialDTO>();
+        private readonly ISingletonSqlConnection _connectionBuilder;
 
-        public MaterialRepository()
+        public MaterialRepository(ISingletonSqlConnection connectionBuilder)
         {
-            
-
-            var material1 = new MaterialDTO()
-            {
-                Id = Guid.NewGuid(),
-                DescripcionMaterial = "Plastico",
-                
-            };
-
-            DataAlmacenada.Add(material1);
+            _connectionBuilder = connectionBuilder;
         }
 
-        public void Create(MaterialDTO material)
+        public void Create(Material material)
         {
-            DataAlmacenada.Add(material);
+            string insertQuery = "INSERT INTO MATERIAL (ID_MATERIAL,DESCRIPCION_MATERIAL) VALUES(@ID, @Descripcion)";
+            SqlCommand sqlCommand = _connectionBuilder.GetCommand(insertQuery);
+            SqlParameter[] parameters = new SqlParameter[]
+            {
+                new SqlParameter() {
+                    Direction = ParameterDirection.Input,
+                    ParameterName = "@ID",
+                    SqlDbType = SqlDbType.UniqueIdentifier,
+                    Value = material.Id
+                },
+                new SqlParameter() {
+                    Direction = ParameterDirection.Input,
+                    ParameterName = "@Descripcion",
+                    SqlDbType = SqlDbType.NVarChar,
+                    Value = material.DescripcionMaterial
+                }
+            };
+            sqlCommand.Parameters.AddRange(parameters);
+            sqlCommand.ExecuteNonQuery();
         }
 
         public void Eliminar(Guid Id)
         {
-            var materialAEliminar = DataAlmacenada.FirstOrDefault(c => c.Id == Id);
-
-            if (materialAEliminar != null)
+            string deleteQuery = "DELETE FROM MATERIAL WHERE ID_MATERIAL = @MaterialId;";
+            SqlCommand sqlCommand = _connectionBuilder.GetCommand(deleteQuery);
+            SqlParameter parameter = new SqlParameter()
             {
-                DataAlmacenada.Remove(materialAEliminar);
-            }
-            else
-            {
-                throw new InvalidOperationException("El material no existe.");
-            }
+                Direction = ParameterDirection.Input,
+                ParameterName = "@MaterialId",
+                SqlDbType = SqlDbType.UniqueIdentifier,
+                Value = Id
+            };
+            sqlCommand.Parameters.Add(parameter);
+            sqlCommand.ExecuteNonQuery();
         }
 
-        public List<MaterialDTO> Get()
+        public async Task<List<Material>> Get()
         {
-            return DataAlmacenada;
+            string query = "SELECT * FROM MATERIAL;";
+            DataTable dataTable = await _connectionBuilder.ExecuteQueryCommandAsync(query);
+            List<Material> material = dataTable.AsEnumerable()
+                .Select(MapEntityFromDataRow)
+                .ToList();
+
+            return material;
         }
 
-        public MaterialDTO GetById(Guid Id)
+        public Material GetById(Guid Id)
         {
-            var materialAMostrar = DataAlmacenada.FirstOrDefault(c => c.Id == Id);
-
-            if (materialAMostrar != null)
+            Material material = null;
+            string getQuery = "SELECT * FROM MATERIAL WHERE ID_MATERIAL = @MaterialId;";
+            SqlCommand sqlCommand = _connectionBuilder.GetCommand(getQuery);
+            SqlParameter parameter = new SqlParameter()
             {
-                return materialAMostrar;
-            }
-            else
+                Direction = ParameterDirection.Input,
+                ParameterName = "@MaterialId",
+                SqlDbType = SqlDbType.UniqueIdentifier,
+                Value = Id
+            };
+            sqlCommand.Parameters.Add(parameter);
+            SqlDataReader reader = sqlCommand.ExecuteReader();
+            if (reader.Read())
             {
-                throw new InvalidOperationException("El material no existe.");
+                material = new Material
+                {
+                    Id = reader.GetGuid(reader.GetOrdinal("ID_MATERIAL")),
+                    DescripcionMaterial = reader.GetString(reader.GetOrdinal("DESCRIPCION_MATERIAL")),
+                };
             }
+            reader.Close();
+            return material;
 
+        }
+
+        private Material MapEntityFromDataRow(DataRow row)
+        {
+            return new Material()
+            {
+                Id = _connectionBuilder.GetDataRowValue<Guid>(row, "ID_MATERIAL"),
+                DescripcionMaterial = _connectionBuilder.GetDataRowValue<string>(row, "DESCRIPCION_MATERIAL")
+            };
         }
     }
 }

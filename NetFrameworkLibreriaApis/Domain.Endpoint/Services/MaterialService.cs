@@ -1,8 +1,10 @@
-﻿using Domain.Endpoint.Entities;
+﻿using Domain.Endpoint.Dtos;
+using Domain.Endpoint.Entities;
 using Domain.Endpoint.Interfaces.Repositories;
 using Domain.Endpoint.Interfaces.Services;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Domain.Endpoint.Services
 {
@@ -14,10 +16,10 @@ namespace Domain.Endpoint.Services
             _repository = repository;
         }
 
-        public MaterialDTO CrearMaterial(MaterialDTO nuevaMaterial)
+        public Material CrearMaterial(MaterialDTO nuevaMaterial)
         {
            
-            MaterialDTO newMaterial = new MaterialDTO()
+            Material newMaterial = new Material()
             {
                 Id = Guid.NewGuid(),
                 DescripcionMaterial = nuevaMaterial.DescripcionMaterial,
@@ -33,12 +35,12 @@ namespace Domain.Endpoint.Services
             _repository.Eliminar(Id);
         }
 
-        public List<MaterialDTO> GetAll()
+        public Task<List<Material>> GetAll()
         {
             return _repository.Get();
         }
 
-        public MaterialDTO GetById(Guid Id)
+        public Material GetById(Guid Id)
         {
             return _repository.GetById(Id);
         }
