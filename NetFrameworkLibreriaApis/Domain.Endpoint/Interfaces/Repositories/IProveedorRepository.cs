@@ -1,16 +1,18 @@
-﻿using Domain.Endpoint.Entities;
+﻿using Domain.Endpoint.Dtos;
+using Domain.Endpoint.Entities;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Domain.Endpoint.Interfaces.Repositories
 {
     public interface IProveedorRepository
     {
-        List<ProveedorDTO> Get();
+        Task<List<Proveedor>> Get();
 
-        ProveedorDTO GetById(Guid Id);
+        Proveedor GetById(Guid Id);
 
-        void Create(ProveedorDTO proveedor);
+        void Create(Proveedor proveedor);
 
         void Eliminar(Guid Id);
 

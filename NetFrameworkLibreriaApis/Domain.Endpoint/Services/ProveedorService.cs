@@ -1,8 +1,10 @@
-﻿using Domain.Endpoint.Entities;
+﻿using Domain.Endpoint.Dtos;
+using Domain.Endpoint.Entities;
 using Domain.Endpoint.Interfaces.Repositories;
 using Domain.Endpoint.Interfaces.Services;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Domain.Endpoint.Services
 {
@@ -15,15 +17,15 @@ namespace Domain.Endpoint.Services
             _repository = repository;
         }
 
-        public ProveedorDTO CrearProveedor(ProveedorDTO nuevoProveedor)
+        public Proveedor CrearProveedor(ProveedorDTO nuevoProveedor)
         {
-            ProveedorDTO newProveedor = new ProveedorDTO()
+            Proveedor newProveedor = new Proveedor()
             {
                 Id = Guid.NewGuid(),
-                NombreProveedor = nuevoProveedor.NombreProveedor,
                 Direccion = nuevoProveedor.Direccion,
-                CorreoEletronico=nuevoProveedor.CorreoEletronico,
-                Telefono = nuevoProveedor.Telefono
+                CorreoElectronico=nuevoProveedor.CorreoElectronico,
+                Telefono = nuevoProveedor.Telefono, 
+                Descripcion=nuevoProveedor.Descripcion
             };
 
             _repository.Create(newProveedor);
@@ -35,7 +37,7 @@ namespace Domain.Endpoint.Services
             _repository.Eliminar(Id);
         }
 
-        public List<ProveedorDTO> GetAll()
+        public Task<List<Proveedor>> GetAll()
         {
             return _repository.Get();
         }
@@ -45,7 +47,7 @@ namespace Domain.Endpoint.Services
             _repository.ModificarProveedor(Id, cambioProveedor);
         }
 
-        public ProveedorDTO GetById(Guid Id)
+        public Proveedor GetById(Guid Id)
         {
             return _repository.GetById(Id);
         }

@@ -1,16 +1,18 @@
-﻿using Domain.Endpoint.Entities;
+﻿using Domain.Endpoint.Dtos;
+using Domain.Endpoint.Entities;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Domain.Endpoint.Interfaces.Services
 {
     public interface IProveedorService
     {
-        List<ProveedorDTO> GetAll();
+        Task<List<Proveedor>> GetAll();
 
-        ProveedorDTO GetById(Guid Id);
+        Proveedor GetById(Guid Id);
 
-        ProveedorDTO CrearProveedor(ProveedorDTO nuevoProveedor);
+        Proveedor CrearProveedor(ProveedorDTO nuevoProveedor);
 
         void EliminarProveedor(Guid Id);
 

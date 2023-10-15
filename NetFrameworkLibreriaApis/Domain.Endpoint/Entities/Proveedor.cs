@@ -1,13 +1,14 @@
 ﻿namespace Domain.Endpoint.Entities
 {
-    public class ProveedorDTO:BaseEntity
+    public class Proveedor:BaseEntity
     {
-        public string NombreProveedor { get; set; }
 
         public string Direccion { get; set; }
 
+        public string Descripcion { get; set; }
+
         public string Telefono { get; set; }
 
-        public string CorreoEletronico { get; set; }
+        public string CorreoElectronico { get; set; }
     }
 }

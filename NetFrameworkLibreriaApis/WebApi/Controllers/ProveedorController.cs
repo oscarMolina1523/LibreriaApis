@@ -1,7 +1,9 @@
-﻿using Domain.Endpoint.Entities;
+﻿using Domain.Endpoint.Dtos;
+using Domain.Endpoint.Entities;
 using Domain.Endpoint.Interfaces.Services;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Web.Http;
 
 namespace WebApi.Controllers
@@ -16,23 +18,23 @@ namespace WebApi.Controllers
         }
 
         [HttpGet]
-        public IHttpActionResult GetProveedor()
+        public async Task<IHttpActionResult> GetProveedor()
         {
-            List<ProveedorDTO> proveedor = _ProveedorService.GetAll();
+            List<Proveedor> proveedor = await _ProveedorService.GetAll();
             return Ok(proveedor);
         }
 
         [HttpGet]
         public IHttpActionResult GetProveedorById(Guid Id)
         {
-            ProveedorDTO proveedor = _ProveedorService.GetById(Id);
+            Proveedor proveedor = _ProveedorService.GetById(Id);
             return Ok(proveedor);
         }
 
         [HttpPost]
         public IHttpActionResult Create(ProveedorDTO nuevoProveedor)
         {
-            ProveedorDTO newProveedor = _ProveedorService.CrearProveedor(nuevoProveedor);
+            Proveedor newProveedor = _ProveedorService.CrearProveedor(nuevoProveedor);
             return Ok(newProveedor);
         }
 
@@ -40,7 +42,7 @@ namespace WebApi.Controllers
         public IHttpActionResult Eliminar(Guid Id)
         {
             _ProveedorService.EliminarProveedor(Id);
-            return Ok();
+            return Ok("proveedor eliminado");
         }
 
         [HttpPut]
