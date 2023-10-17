@@ -2,65 +2,105 @@
 using Domain.Endpoint.Interfaces.Repositories;
 using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
+using System.Data;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Infrastructure.Endpoint.Data.Repositories
 {
     public class MedidaRepository : IMedidaRepository
     {
-        private readonly List<UnidadMedidaDTO> DataAlmacenada = new List<UnidadMedidaDTO>();
+        private readonly ISingletonSqlConnection _connectionBuilder;
 
-        public MedidaRepository()
+        public MedidaRepository(ISingletonSqlConnection connectionBuilder)
         {
-            
-
-            var medida1 = new UnidadMedidaDTO()
-            {
-                Id = Guid.NewGuid(),
-                DescripcionMedida = "Unidades",
-                
-            };
-
-            DataAlmacenada.Add(medida1);
+            _connectionBuilder = connectionBuilder;
         }
 
-        public void Create(UnidadMedidaDTO medida)
+        public void Create(UnidadMedida medida)
         {
-            DataAlmacenada.Add(medida);
+            string insertQuery = "INSERT INTO UNIDAD_MEDIDA (ID_UNIDAD_MEDIDA,DESCRIPCION_MEDIDA) VALUES(@ID, @Descripcion)";
+            SqlCommand sqlCommand = _connectionBuilder.GetCommand(insertQuery);
+            SqlParameter[] parameters = new SqlParameter[]
+            {
+                new SqlParameter() {
+                    Direction = ParameterDirection.Input,
+                    ParameterName = "@ID",
+                    SqlDbType = SqlDbType.UniqueIdentifier,
+                    Value = medida.Id
+                },
+                new SqlParameter() {
+                    Direction = ParameterDirection.Input,
+                    ParameterName = "@Descripcion",
+                    SqlDbType = SqlDbType.NVarChar,
+                    Value = medida.DescripcionMedida
+                }
+            };
+            sqlCommand.Parameters.AddRange(parameters);
+            sqlCommand.ExecuteNonQuery();
         }
 
         public void Eliminar(Guid Id)
         {
-            var medidaAEliminar = DataAlmacenada.FirstOrDefault(c => c.Id == Id);
-
-            if (medidaAEliminar != null)
+            string deleteQuery = "DELETE FROM UNIDAD_MEDIDA WHERE ID_UNIDAD_MEDIDA = @MedidaId;";
+            SqlCommand sqlCommand = _connectionBuilder.GetCommand(deleteQuery);
+            SqlParameter parameter = new SqlParameter()
             {
-                DataAlmacenada.Remove(medidaAEliminar);
-            }
-            else
-            {
-                throw new InvalidOperationException("La medida no existe.");
-            }
+                Direction = ParameterDirection.Input,
+                ParameterName = "@MedidaId",
+                SqlDbType = SqlDbType.UniqueIdentifier,
+                Value = Id
+            };
+            sqlCommand.Parameters.Add(parameter);
+            sqlCommand.ExecuteNonQuery();
         }
 
-        public List<UnidadMedidaDTO> Get()
+        public async Task<List<UnidadMedida>> Get()
         {
-            return DataAlmacenada;
+            string query = "SELECT * FROM UNIDAD_MEDIDA;";
+            DataTable dataTable = await _connectionBuilder.ExecuteQueryCommandAsync(query);
+            List<UnidadMedida> medida = dataTable.AsEnumerable()
+                .Select(MapEntityFromDataRow)
+                .ToList();
+
+            return medida;
         }
 
-        public UnidadMedidaDTO GetById(Guid Id)
+        public UnidadMedida GetById(Guid Id)
         {
-            var medidaAMostrar = DataAlmacenada.FirstOrDefault(c => c.Id == Id);
-
-            if (medidaAMostrar != null)
+            UnidadMedida medida = null;
+            string getQuery = "SELECT * FROM UNIDAD_MEDIDA WHERE ID_UNIDAD_MEDIDA = @MedidaId;";
+            SqlCommand sqlCommand = _connectionBuilder.GetCommand(getQuery);
+            SqlParameter parameter = new SqlParameter()
             {
-                return medidaAMostrar;
-            }
-            else
+                Direction = ParameterDirection.Input,
+                ParameterName = "@MedidaId",
+                SqlDbType = SqlDbType.UniqueIdentifier,
+                Value = Id
+            };
+            sqlCommand.Parameters.Add(parameter);
+            SqlDataReader reader = sqlCommand.ExecuteReader();
+            if (reader.Read())
             {
-                throw new InvalidOperationException("La unidad de medida no existe.");
+                medida = new UnidadMedida
+                {
+                    Id = reader.GetGuid(reader.GetOrdinal("ID_UNIDAD_MEDIDA")),
+                    DescripcionMedida = reader.GetString(reader.GetOrdinal("DESCRIPCION_MEDIDA")),
+                };
             }
+            reader.Close();
+            return medida;
 
+        }
+
+        private UnidadMedida MapEntityFromDataRow(DataRow row)
+        {
+            return new UnidadMedida()
+            {
+                Id = _connectionBuilder.GetDataRowValue<Guid>(row, "ID_UNIDAD_MEDIDA"),
+                DescripcionMedida = _connectionBuilder.GetDataRowValue<string>(row, "DESCRIPCION_MEDIDA")
+            };
         }
     }
 }

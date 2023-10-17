@@ -1,16 +1,18 @@
-﻿using Domain.Endpoint.Entities;
+﻿using Domain.Endpoint.Dtos;
+using Domain.Endpoint.Entities;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Domain.Endpoint.Interfaces.Services
 {
     public interface IUsuarioService
     {
-        List<UsuarioDTO> GetAll();
+        Task<List<Usuario>> GetAll();
 
-        UsuarioDTO GetById(Guid Id);
+        Usuario GetById(Guid Id);
 
-        UsuarioDTO CrearUsuario(UsuarioDTO nuevoUsuario);
+        Usuario CrearUsuario(UsuarioDTO nuevoUsuario);
 
         void EliminarUsuario(Guid Id);
 

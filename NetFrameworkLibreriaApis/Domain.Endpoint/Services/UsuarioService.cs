@@ -1,8 +1,10 @@
-﻿using Domain.Endpoint.Entities;
+﻿using Domain.Endpoint.Dtos;
+using Domain.Endpoint.Entities;
 using Domain.Endpoint.Interfaces.Repositories;
 using Domain.Endpoint.Interfaces.Services;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Domain.Endpoint.Services
 {
@@ -15,10 +17,10 @@ namespace Domain.Endpoint.Services
             _repository = repository;
         }
 
-        public UsuarioDTO CrearUsuario(UsuarioDTO nuevoUsuario)
+        public Usuario CrearUsuario(UsuarioDTO nuevoUsuario)
         {
             
-            UsuarioDTO newUsuario = new UsuarioDTO()
+            Usuario newUsuario = new Usuario()
             {
                 Id = Guid.NewGuid(),
                 NombreUsuario=nuevoUsuario.NombreUsuario,
@@ -36,7 +38,7 @@ namespace Domain.Endpoint.Services
             _repository.Eliminar(Id);
         }
 
-        public List<UsuarioDTO> GetAll()
+        public Task<List<Usuario>> GetAll()
         {
            return _repository.Get();
         }
@@ -46,7 +48,7 @@ namespace Domain.Endpoint.Services
             _repository.ModificarUsuario(Id, cambioUsuario);
         }
 
-        public UsuarioDTO GetById(Guid Id)
+        public Usuario GetById(Guid Id)
         {
             return _repository.GetById(Id);
         }

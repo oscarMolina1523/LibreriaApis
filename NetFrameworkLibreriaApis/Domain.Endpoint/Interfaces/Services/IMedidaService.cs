@@ -1,16 +1,18 @@
-﻿using Domain.Endpoint.Entities;
+﻿using Domain.Endpoint.Dtos;
+using Domain.Endpoint.Entities;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Domain.Endpoint.Interfaces.Services
 {
     public interface IMedidaService
     {
-        List<UnidadMedidaDTO> GetAll();
+        Task<List<UnidadMedida>> GetAll();
 
-        UnidadMedidaDTO GetById(Guid Id);
+        UnidadMedida GetById(Guid Id);
 
-        UnidadMedidaDTO CrearMedida(UnidadMedidaDTO nuevaMedida);
+        UnidadMedida CrearMedida(UnidadMedidaDTO nuevaMedida);
 
         void EliminarMedida(Guid Id);
     }

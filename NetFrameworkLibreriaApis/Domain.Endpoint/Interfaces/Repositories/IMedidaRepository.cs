@@ -1,16 +1,17 @@
 ﻿using Domain.Endpoint.Entities;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Domain.Endpoint.Interfaces.Repositories
 {
     public interface IMedidaRepository
     {
-        List<UnidadMedidaDTO> Get();
+        Task<List<UnidadMedida>> Get();
 
-        UnidadMedidaDTO GetById(Guid Id);
+        UnidadMedida GetById(Guid Id);
 
-        void Create(UnidadMedidaDTO medida);
+        void Create(UnidadMedida medida);
 
         void Eliminar(Guid Id);
     }

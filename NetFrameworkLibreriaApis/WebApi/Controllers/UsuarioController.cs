@@ -1,7 +1,9 @@
-﻿using Domain.Endpoint.Entities;
+﻿using Domain.Endpoint.Dtos;
+using Domain.Endpoint.Entities;
 using Domain.Endpoint.Interfaces.Services;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Web.Http;
 
 namespace WebApi.Controllers
@@ -16,23 +18,23 @@ namespace WebApi.Controllers
         }
 
         [HttpGet]
-        public IHttpActionResult GetUsuario()
+        public async Task<IHttpActionResult> GetUsuario()
         {
-            List<UsuarioDTO> usuario = _UsuarioService.GetAll();
+            List<Usuario> usuario = await _UsuarioService.GetAll();
             return Ok(usuario);
         }
 
         [HttpGet]
         public IHttpActionResult GetUsuarioById(Guid Id)
         {
-            UsuarioDTO usuario = _UsuarioService.GetById(Id);
+            Usuario usuario = _UsuarioService.GetById(Id);
             return Ok(usuario);
         }
 
         [HttpPost]
         public IHttpActionResult Create(UsuarioDTO nuevoUsuario)
         {
-            UsuarioDTO newUsuario = _UsuarioService.CrearUsuario(nuevoUsuario);
+            Usuario newUsuario = _UsuarioService.CrearUsuario(nuevoUsuario);
             return Ok(newUsuario);
         }
 

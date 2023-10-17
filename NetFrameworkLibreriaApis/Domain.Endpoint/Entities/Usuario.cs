@@ -2,7 +2,7 @@
 
 namespace Domain.Endpoint.Entities
 {
-    public class UsuarioDTO:BaseEntity
+    public class Usuario:BaseEntity
     {
         public string NombreUsuario { get; set; }
 

@@ -1,7 +1,9 @@
-﻿using Domain.Endpoint.Entities;
+﻿using Domain.Endpoint.Dtos;
+using Domain.Endpoint.Entities;
 using Domain.Endpoint.Interfaces.Services;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Web.Http;
 
 namespace WebApi.Controllers
@@ -16,23 +18,23 @@ namespace WebApi.Controllers
         }
 
         [HttpGet]
-        public IHttpActionResult GetMedida()
+        public async Task<IHttpActionResult> GetMedida()
         {
-            List<UnidadMedidaDTO> medida = _MedidaService.GetAll();
+            List<UnidadMedida> medida =await _MedidaService.GetAll();
             return Ok(medida);
         }
 
         [HttpGet]
         public IHttpActionResult GetMedidaById(Guid Id)
         {
-            UnidadMedidaDTO medida = _MedidaService.GetById(Id);
+            UnidadMedida medida = _MedidaService.GetById(Id);
             return Ok(medida);
         }
 
         [HttpPost]
         public IHttpActionResult Create(UnidadMedidaDTO nuevaMedida)
         {
-            UnidadMedidaDTO newMedida = _MedidaService.CrearMedida(nuevaMedida);
+            UnidadMedida newMedida = _MedidaService.CrearMedida(nuevaMedida);
             return Ok(newMedida);
         }
 

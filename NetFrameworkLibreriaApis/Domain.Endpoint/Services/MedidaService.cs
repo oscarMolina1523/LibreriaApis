@@ -1,8 +1,10 @@
-﻿using Domain.Endpoint.Entities;
+﻿using Domain.Endpoint.Dtos;
+using Domain.Endpoint.Entities;
 using Domain.Endpoint.Interfaces.Repositories;
 using Domain.Endpoint.Interfaces.Services;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Domain.Endpoint.Services
 {
@@ -14,10 +16,10 @@ namespace Domain.Endpoint.Services
             _repository = repository;
         }
 
-        public UnidadMedidaDTO CrearMedida(UnidadMedidaDTO nuevaMedida)
+        public UnidadMedida CrearMedida(UnidadMedidaDTO nuevaMedida)
         {
             
-            UnidadMedidaDTO newMedida = new UnidadMedidaDTO()
+            UnidadMedida newMedida = new UnidadMedida()
             {
                 Id = Guid.NewGuid(),
                 DescripcionMedida = nuevaMedida.DescripcionMedida,
@@ -33,13 +35,13 @@ namespace Domain.Endpoint.Services
             _repository.Eliminar(Id);
         }
 
-        public List<UnidadMedidaDTO> GetAll()
+        public Task<List<UnidadMedida>> GetAll()
         {
 
             return _repository.Get();
         }
 
-        public UnidadMedidaDTO GetById(Guid Id)
+        public UnidadMedida GetById(Guid Id)
         {
             return _repository.GetById(Id);
         }
