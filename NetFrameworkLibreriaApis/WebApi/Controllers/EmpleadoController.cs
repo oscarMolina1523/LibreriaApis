@@ -3,6 +3,7 @@ using Domain.Endpoint.Entities;
 using Domain.Endpoint.Interfaces.Services;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Http;
 
@@ -36,6 +37,13 @@ namespace WebApi.Controllers
         [HttpPost]
         public IHttpActionResult Create(EmpleadoDTO nuevoEmpleado)
         {
+
+            if (!ModelState.IsValid)
+            {
+                var errors = ModelState.Values.SelectMany(v => v.Errors.Select(e => e.ErrorMessage));
+                return BadRequest(string.Join(" ", errors));
+            }
+
             Empleado newEmpleado = _EmpleadoService.CrearEmpleado(nuevoEmpleado);
 
             return Ok(newEmpleado);

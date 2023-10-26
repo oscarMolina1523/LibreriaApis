@@ -42,6 +42,8 @@ namespace WebApi
                     .Where(t => !t.IsAbstract && !t.IsGenericTypeDefinition)
                     .Where(t => typeof(IHttpController).IsAssignableFrom(t) || t.Name.EndsWith("Controller", StringComparison.OrdinalIgnoreCase))
             );
+            GlobalConfiguration.Configuration.IncludeErrorDetailPolicy = IncludeErrorDetailPolicy.Always;
+
 
             services.AddScoped<ICategoriaService, CategoriaService>();
             services.AddScoped<IMarcaService, MarcaService>();

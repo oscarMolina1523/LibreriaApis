@@ -40,7 +40,7 @@ namespace Domain.Endpoint.Services
 
         public Task<List<Usuario>> GetAll()
         {
-           return _repository.Get();
+          return _repository.Get(); 
         }
 
         public void ModificarUsuario(Guid Id, UsuarioDTO cambioUsuario)

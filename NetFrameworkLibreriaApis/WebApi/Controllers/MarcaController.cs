@@ -37,6 +37,12 @@ namespace WebApi.Controllers
         [HttpPost]
         public IHttpActionResult Create(MarcaDTO nuevaMarca)
         {
+            if (!ModelState.IsValid)
+            {
+                var errors = ModelState.Values.SelectMany(v => v.Errors.Select(e => e.ErrorMessage));
+                return BadRequest(string.Join(" ", errors));
+            }
+
             Marca newMarca = _MarcaService.CrearMarca(nuevaMarca);
             return Ok(newMarca);
         }

@@ -3,6 +3,7 @@ using Domain.Endpoint.Entities;
 using Domain.Endpoint.Interfaces.Services;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Http;
 
@@ -34,6 +35,12 @@ namespace WebApi.Controllers
         [HttpPost]
         public IHttpActionResult Create(ProveedorDTO nuevoProveedor)
         {
+            if (!ModelState.IsValid)
+            {
+                var errors = ModelState.Values.SelectMany(v => v.Errors.Select(e => e.ErrorMessage));
+                return BadRequest(string.Join(" ", errors));
+            }
+
             Proveedor newProveedor = _ProveedorService.CrearProveedor(nuevoProveedor);
             return Ok(newProveedor);
         }

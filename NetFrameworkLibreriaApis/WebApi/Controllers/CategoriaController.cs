@@ -3,6 +3,7 @@ using Domain.Endpoint.Entities;
 using Domain.Endpoint.Interfaces.Services;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Description;
@@ -35,6 +36,12 @@ namespace WebApi.Controllers
         [HttpPost]
         public IHttpActionResult Create(CategoriaDTO nuevaCategoria)
         {
+            if (!ModelState.IsValid)
+            {
+                var errors = ModelState.Values.SelectMany(v => v.Errors.Select(e => e.ErrorMessage));
+                return BadRequest(string.Join(" ", errors));
+            }
+
             Categoria newCategoria = _CategoriaService.crearCategoria(nuevaCategoria);
             return Ok(newCategoria);
         }
