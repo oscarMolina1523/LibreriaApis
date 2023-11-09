@@ -9,10 +9,10 @@ namespace Domain.Endpoint.Interfaces.Repositories
     {
         Task<List<Marca>> Get();
 
-        Marca GetById(Guid Id);
+        Task<Marca> GetById(Guid Id);
 
         void Create(Marca marca);
 
-        void Eliminar(Guid Id);
+        Task Eliminar(Marca marca);
     }
 }

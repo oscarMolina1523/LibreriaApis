@@ -30,9 +30,12 @@ namespace Domain.Endpoint.Services
             return newMarca;
         }
 
-        public void EliminarMarca(Guid Id)
+        public async Task<Marca> EliminarMarca(Guid Id)
         {
-            _repository.Eliminar(Id);
+            //_repository.Eliminar(Id);
+            Marca marca = await GetById(Id);
+            await _repository.Eliminar(marca);
+            return marca;
         }
 
         public Task<List<Marca>> GetAll()
@@ -40,9 +43,9 @@ namespace Domain.Endpoint.Services
             return _repository.Get();
         }
 
-        public Marca GetById(Guid Id)
+        public async Task<Marca> GetById(Guid Id)
         {
-            return _repository.GetById(Id);
+            return await _repository.GetById(Id);
         }
     }
 }

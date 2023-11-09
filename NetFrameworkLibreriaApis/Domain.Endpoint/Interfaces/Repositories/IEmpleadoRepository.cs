@@ -8,14 +8,14 @@ namespace Domain.Endpoint.Interfaces.Repositories
 {
     public interface IEmpleadoRepository 
     {
-        Task<List<Empleado>> Get(); 
+        Task<List<Empleado>> Get();
 
-        Empleado GetById(Guid Id); 
+        Task<Empleado> GetById(Guid Id); 
 
         void Create(Empleado empleado);
 
-        void Eliminar(Guid Id);
+        Task Eliminar(Empleado empleado);
 
-        void ModificarEmpleado(Guid Id, EmpleadoDTO modificarEmpleado);
+        Task ModificarEmpleado(Empleado modificarEmpleado);
     }
 }

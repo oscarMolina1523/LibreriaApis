@@ -28,9 +28,9 @@ namespace WebApi.Controllers
         }
 
         [HttpGet]
-        public IHttpActionResult GetMarcaById(Guid Id)
+        public async Task<IHttpActionResult> GetMarcaById(Guid Id)
         {
-            Marca marca = _MarcaService.GetById(Id);
+            Marca marca = await _MarcaService.GetById(Id);
             return Ok(marca);
         }
 
@@ -48,9 +48,9 @@ namespace WebApi.Controllers
         }
 
         [HttpDelete]
-        public IHttpActionResult Eliminar(Guid Id)
+        public async Task<IHttpActionResult> Eliminar(Guid Id)
         {
-            _MarcaService.EliminarMarca(Id);
+           await  _MarcaService.EliminarMarca(Id);
             return Ok("la marca ha sido eliminada");
         }
     }

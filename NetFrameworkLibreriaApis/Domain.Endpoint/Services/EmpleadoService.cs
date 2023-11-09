@@ -32,9 +32,12 @@ namespace Domain.Endpoint.Services
             return newEmpleado;
         }
 
-        public void EliminarEmpleado(Guid Id)
+        public async Task<Empleado> EliminarEmpleado(Guid Id)
         {
-            _repository.Eliminar(Id);
+            //_repository.Eliminar(Id);
+            Empleado empleado = await GetById(Id);
+            await _repository.Eliminar(empleado);
+            return empleado;
         }
 
         public Task<List<Empleado>> GetAll()
@@ -42,14 +45,27 @@ namespace Domain.Endpoint.Services
             return _repository.Get();
         }
 
-        public void ModificarEmpleado(Guid Id, EmpleadoDTO cambioEmpleado)
+        public async Task<Empleado> ModificarEmpleado(Guid Id, EmpleadoDTO cambioEmpleado)
         {
-            _repository.ModificarEmpleado(Id, cambioEmpleado);
+            //_repository.ModificarEmpleado(Id, cambioEmpleado);
+            Empleado empleado = await GetById(Id);
+
+            Empleado newEmpleado = new Empleado
+            {
+                Id = empleado.Id,
+                Nombres = cambioEmpleado.Nombres,
+                Apellidos = cambioEmpleado.Apellidos,
+                Cedula = cambioEmpleado.Cedula,
+                Telefono = cambioEmpleado.Telefono
+            };
+
+            await _repository.ModificarEmpleado(newEmpleado);
+            return newEmpleado;
         }
 
-        public Empleado GetById(Guid Id)
+        public async Task<Empleado> GetById(Guid Id)
         {
-            return _repository.GetById(Id);
+            return await _repository.GetById(Id);
         }
     }
 }

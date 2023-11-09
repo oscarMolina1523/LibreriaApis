@@ -7,81 +7,64 @@ using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Infrastructure.Endpoint.Interfaces;
+using static Infrastructure.Endpoint.Builders.SqlOperations;
 
 namespace Infrastructure.Endpoint.Data.Repositories
 {
     class MarcaRepository : IMarcaRepository
     {
+        private readonly ISqlCommandOperationBuilder _operationBuilder;
         private readonly ISingletonSqlConnection _connectionBuilder;
 
-        public MarcaRepository(ISingletonSqlConnection connectionBuilder)
+        public MarcaRepository(ISingletonSqlConnection connectionBuilder, ISqlCommandOperationBuilder operationBuilder)
         {
             _connectionBuilder = connectionBuilder;
+            _operationBuilder = operationBuilder;
         }
 
         public void Create(Marca marca)
         {
-            string insertQuery = "INSERT INTO MARCA (ID_MARCA,DESCRIPCION_MARCA) VALUES(@ID, @Descripcion)";
-            SqlCommand sqlCommand = _connectionBuilder.GetCommand(insertQuery);
-            SqlParameter[] parameters = new SqlParameter[]
-            {
-                new SqlParameter() {
-                    Direction = ParameterDirection.Input,
-                    ParameterName = "@ID",
-                    SqlDbType = SqlDbType.UniqueIdentifier,
-                    Value = marca.Id
-                },
-                new SqlParameter() {
-                    Direction = ParameterDirection.Input,
-                    ParameterName = "@Descripcion",
-                    SqlDbType = SqlDbType.NVarChar,
-                    Value = marca.DescripcionMarca
-                }
-            };
-            sqlCommand.Parameters.AddRange(parameters);
-            sqlCommand.ExecuteNonQuery();
+            SqlCommand writeCommand = _operationBuilder.From(marca)
+                .WithOperation(SqlWriteOperation.Create)
+                .BuildWritter();
+            _connectionBuilder.ExecuteNonQueryCommandAsync(writeCommand);
         }
 
-        public void Eliminar(Guid Id)
+        public async Task Eliminar(Marca marca)
         {
-            string deleteQuery = "DELETE FROM MARCA WHERE ID_MARCA = @MarcaId;";
-            SqlCommand sqlCommand = _connectionBuilder.GetCommand(deleteQuery);
-            SqlParameter parameter = new SqlParameter()
-            {
-                Direction = ParameterDirection.Input,
-                ParameterName = "@MarcaId",
-                SqlDbType = SqlDbType.UniqueIdentifier,
-                Value = Id
-            };
-            sqlCommand.Parameters.Add(parameter);
-            sqlCommand.ExecuteNonQuery();
+            SqlCommand writeCommand = _operationBuilder.From(marca)
+                .WithOperation(SqlWriteOperation.Delete)
+                .BuildWritter();
+            await _connectionBuilder.ExecuteNonQueryCommandAsync(writeCommand);
         }
 
         public async Task<List<Marca>> Get()
         {
-            string query = "SELECT * FROM MARCA;";
-            DataTable dataTable = await _connectionBuilder.ExecuteQueryCommandAsync(query);
-            List<Marca> marca = dataTable.AsEnumerable()
-                .Select(MapEntityFromDataRow)
-                .ToList();
+            SqlCommand readCommand = _operationBuilder.Initialize<Marca>()
+                .WithOperation(SqlReadOperation.Select)
+                .BuildReader();
+            DataTable dt = await _connectionBuilder.ExecuteQueryCommandAsync(readCommand);
 
-            return marca;
+            List<Marca> marcas = dt.AsEnumerable().Select(row =>
+            new Marca
+            {
+                Id = row.Field<Guid>("ID_MARCA"),
+                DescripcionMarca = row.Field<string>("DESCRIPCION_MARCA"),
+            }).ToList();
+
+            return marcas;
         }
 
-        public Marca GetById(Guid Id)
+        public async Task<Marca> GetById(Guid Id)
         {
-            Marca marca = null;
-            string getQuery = "SELECT * FROM MARCA WHERE ID_MARCA = @MarcaId;";
-            SqlCommand sqlCommand = _connectionBuilder.GetCommand(getQuery);
-            SqlParameter parameter = new SqlParameter()
-            {
-                Direction = ParameterDirection.Input,
-                ParameterName = "@MarcaId",
-                SqlDbType = SqlDbType.UniqueIdentifier,
-                Value = Id
-            };
-            sqlCommand.Parameters.Add(parameter);
-            SqlDataReader reader = sqlCommand.ExecuteReader();
+            SqlCommand readCommand = _operationBuilder.Initialize<Marca>()
+            .WithOperation(SqlReadOperation.SelectById)
+            .WithId(Id)
+            .BuildReader();
+            Marca marca = new Marca();
+            await _connectionBuilder.ExecuteQueryCommandAsync(readCommand);
+            SqlDataReader reader = readCommand.ExecuteReader();
             if (reader.Read())
             {
                 marca = new Marca

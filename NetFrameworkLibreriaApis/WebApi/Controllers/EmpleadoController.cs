@@ -27,9 +27,9 @@ namespace WebApi.Controllers
         }
 
         [HttpGet]
-        public IHttpActionResult GetEmpleadoById(Guid Id)
+        public async Task<IHttpActionResult> GetEmpleadoById(Guid Id)
         {
-            Empleado empleado = _EmpleadoService.GetById(Id);
+            Empleado empleado = await _EmpleadoService.GetById(Id);
 
             return Ok(empleado);
         }
@@ -50,17 +50,17 @@ namespace WebApi.Controllers
         }
 
         [HttpDelete]
-        public IHttpActionResult Eliminar(Guid Id)
+        public async Task<IHttpActionResult> Eliminar(Guid Id)
         {
-            _EmpleadoService.EliminarEmpleado(Id);
+            await _EmpleadoService.EliminarEmpleado(Id);
 
             return Ok("el empleado ha sido eliminado");
         }
 
         [HttpPut]
-        public IHttpActionResult modificarEmpleado(Guid Id, EmpleadoDTO nuevosCampos)
+        public async Task<IHttpActionResult> modificarEmpleado(Guid Id, EmpleadoDTO nuevosCampos)
         {
-            _EmpleadoService.ModificarEmpleado(Id, nuevosCampos);
+            await _EmpleadoService.ModificarEmpleado(Id, nuevosCampos);
 
             return Ok("El empleado ha sido modificado");
         }

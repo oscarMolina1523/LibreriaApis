@@ -7,155 +7,88 @@ using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using Domain.Endpoint.Dtos;
+using Infrastructure.Endpoint.Interfaces;
+using static Infrastructure.Endpoint.Builders.SqlOperations;
 
 namespace Infrastructure.Endpoint.Data.Repositories
 {
     class EmpleadoRepository : IEmpleadoRepository
     {
-
+        private readonly ISqlCommandOperationBuilder _operationBuilder;
         private readonly ISingletonSqlConnection _connectionBuilder;  
 
-        public EmpleadoRepository(ISingletonSqlConnection connectionBuilder)
+        public EmpleadoRepository(ISingletonSqlConnection connectionBuilder, ISqlCommandOperationBuilder operationBuilder)
         {
             _connectionBuilder = connectionBuilder;
+            _operationBuilder = operationBuilder;
         }
 
         public void Create(Empleado empleado)
         {
-            string insertQuery = "INSERT INTO EMPLEADO (ID_EMPLEADO,NOMBRES,APELLIDOS, CEDULA, TELEFONO) VALUES(@ID, @Nombres,@Apellidos, @Cedula, @Telefono)";
-            SqlCommand sqlCommand = _connectionBuilder.GetCommand(insertQuery);
-            SqlParameter[] parameters = new SqlParameter[]
-            {
-                new SqlParameter() {
-                    Direction = ParameterDirection.Input,
-                    ParameterName = "@ID",
-                    SqlDbType = SqlDbType.UniqueIdentifier,
-                    Value = empleado.Id
-                },
-                new SqlParameter() {
-                    Direction = ParameterDirection.Input,
-                    ParameterName = "@Nombres",
-                    SqlDbType = SqlDbType.NVarChar,
-                    Value = empleado.Nombres
-                },
-                new SqlParameter() {
-                    Direction = ParameterDirection.Input,
-                    ParameterName = "@Apellidos",
-                    SqlDbType = SqlDbType.NVarChar,
-                    Value = empleado.Apellidos
-                },
-                new SqlParameter() {
-                    Direction = ParameterDirection.Input,
-                    ParameterName = "@Cedula",
-                    SqlDbType = SqlDbType.NVarChar,
-                    Value = empleado.Cedula
-                },
-                new SqlParameter() {
-                    Direction = ParameterDirection.Input,
-                    ParameterName = "@Telefono", 
-                    SqlDbType = SqlDbType.NVarChar,
-                    Value = empleado.Telefono
-                }
-            };
-            sqlCommand.Parameters.AddRange(parameters);
-            sqlCommand.ExecuteNonQuery();
+            SqlCommand writeCommand = _operationBuilder.From(empleado)
+                .WithOperation(SqlWriteOperation.Create)
+                .BuildWritter();
+            _connectionBuilder.ExecuteNonQueryCommandAsync(writeCommand);
         }
 
-        public void Eliminar(Guid Id)
+        public async Task Eliminar(Empleado empleado)
         {
-            string deleteQuery = "DELETE FROM EMPLEADO WHERE ID_EMPLEADO = @EmpleadoId;";
-            SqlCommand sqlCommand = _connectionBuilder.GetCommand(deleteQuery);
-            SqlParameter parameter = new SqlParameter()
-            {
-                Direction = ParameterDirection.Input,
-                ParameterName = "@EmpleadoId",
-                SqlDbType = SqlDbType.UniqueIdentifier,
-                Value = Id
-            };
-            sqlCommand.Parameters.Add(parameter);
-            sqlCommand.ExecuteNonQuery();
+            SqlCommand writeCommand = _operationBuilder.From(empleado)
+                .WithOperation(SqlWriteOperation.Delete)
+                .BuildWritter();
+            await _connectionBuilder.ExecuteNonQueryCommandAsync(writeCommand);
         }
 
         public async Task<List<Empleado>> Get()
         {
-            string query = "SELECT * FROM EMPLEADO;";
-            DataTable dataTable = await _connectionBuilder.ExecuteQueryCommandAsync(query);
-            List<Empleado> empleado = dataTable.AsEnumerable()
-                .Select(MapEntityFromDataRow)
-                .ToList();
+            SqlCommand readCommand = _operationBuilder.Initialize<Empleado>()
+               .WithOperation(SqlReadOperation.Select)
+               .BuildReader();
+            DataTable dt = await _connectionBuilder.ExecuteQueryCommandAsync(readCommand);
 
-            return empleado;
+            List<Empleado> empleados = dt.AsEnumerable().Select(row =>
+            new Empleado
+            {
+                Id = row.Field<Guid>("ID_EMPLEADO"),
+                Nombres = row.Field<string>("NOMBRES"),
+                Apellidos=row.Field<string>("APELLIDOS"),
+                Cedula = row.Field<string>("CEDULA"),
+                Telefono = row.Field<string>("TELEFONO")
+            }).ToList();
+
+            return empleados;
         }
 
-        public void ModificarEmpleado(Guid Id, EmpleadoDTO modificarEmpleado)
+        public async Task ModificarEmpleado(Empleado modificarEmpleado)
         {
-            string updateQuery = "UPDATE EMPLEADO SET NOMBRES = @Nombres,APELLIDOS=@Apellidos, CEDULA = @Cedula, TELEFONO=@Telefono WHERE ID_EMPLEADO = @Id;";
-            SqlCommand sqlCommand = _connectionBuilder.GetCommand(updateQuery);
-            SqlParameter[] parameters = new SqlParameter[]
-            {
-                new SqlParameter() {
-                    Direction = ParameterDirection.Input,
-                    ParameterName = "@Id",
-                    SqlDbType = SqlDbType.UniqueIdentifier,
-                    Value = Id
-                },
-                new SqlParameter() {
-                    Direction = ParameterDirection.Input,
-                    ParameterName = "@Nombres",
-                    SqlDbType = SqlDbType.NVarChar,
-                    Value = modificarEmpleado.Nombres
-                },
-                new SqlParameter() {
-                    Direction = ParameterDirection.Input,
-                    ParameterName = "@Apellidos",
-                    SqlDbType = SqlDbType.NVarChar,
-                    Value = modificarEmpleado.Apellidos
-                },
-                new SqlParameter() {
-                    Direction = ParameterDirection.Input,
-                    ParameterName = "@Cedula",
-                    SqlDbType = SqlDbType.NVarChar,
-                    Value = modificarEmpleado.Cedula
-                },
-                new SqlParameter() {
-                    Direction = ParameterDirection.Input,
-                    ParameterName = "@Telefono",
-                    SqlDbType = SqlDbType.NVarChar,
-                    Value = modificarEmpleado.Telefono
-                },
-            };
-            sqlCommand.Parameters.AddRange(parameters);
-            sqlCommand.ExecuteNonQuery();
+            SqlCommand writeCommand = _operationBuilder.From(modificarEmpleado)
+               .WithOperation(SqlWriteOperation.Update)
+               .BuildWritter();
+            await _connectionBuilder.ExecuteNonQueryCommandAsync(writeCommand);
         }
 
-        public Empleado GetById(Guid Id)
+        public async Task<Empleado> GetById(Guid Id)
         {
-            Empleado empleado = null;
-            string getQuery = "SELECT * FROM EMPLEADO WHERE ID_EMPLEADO = @EmpleadoId;";
-            SqlCommand sqlCommand = _connectionBuilder.GetCommand(getQuery);
-            SqlParameter parameter = new SqlParameter()
-            {
-                Direction = ParameterDirection.Input,
-                ParameterName = "@EmpleadoId",
-                SqlDbType = SqlDbType.UniqueIdentifier,
-                Value = Id
-            };
-            sqlCommand.Parameters.Add(parameter);
-            SqlDataReader reader = sqlCommand.ExecuteReader();
+            SqlCommand readCommand = _operationBuilder.Initialize<Empleado>()
+            .WithOperation(SqlReadOperation.SelectById)
+            .WithId(Id)
+            .BuildReader();
+            Empleado empleado = new Empleado();
+            await _connectionBuilder.ExecuteQueryCommandAsync(readCommand);
+            SqlDataReader reader = readCommand.ExecuteReader();
             if (reader.Read())
             {
                 empleado = new Empleado
                 {
                     Id = reader.GetGuid(reader.GetOrdinal("ID_EMPLEADO")),
                     Nombres = reader.GetString(reader.GetOrdinal("NOMBRES")),
-                    Apellidos = reader.GetString(reader.GetOrdinal("APELLIDOS")),
+                    Apellidos=reader.GetString(reader.GetOrdinal("APELLIDOS")),
                     Cedula = reader.GetString(reader.GetOrdinal("CEDULA")),
-                    Telefono = reader.GetString(reader.GetOrdinal("TELEFONO")),
+                    Telefono = reader.GetString(reader.GetOrdinal("TELEFONO"))
                 };
             }
             reader.Close();
             return empleado;
-
         }
 
         private Empleado MapEntityFromDataRow(DataRow row)

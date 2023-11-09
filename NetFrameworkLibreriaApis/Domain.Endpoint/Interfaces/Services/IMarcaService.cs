@@ -10,10 +10,10 @@ namespace Domain.Endpoint.Interfaces.Services
     {
         Task<List<Marca>> GetAll();
 
-        Marca GetById(Guid Id);
+        Task<Marca> GetById(Guid Id);
 
         Marca CrearMarca(MarcaDTO nuevaMarca);
 
-        void EliminarMarca(Guid Id);
+        Task<Marca> EliminarMarca(Guid Id);
     }
 }
