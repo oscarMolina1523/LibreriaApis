@@ -8,7 +8,7 @@ namespace Domain.Endpoint.Interfaces.Repositories
 {
     public interface IEmpleadoRepository 
     {
-        Task<List<Empleado>> Get();
+        Task<List<Empleado>> Get(); 
 
         Empleado GetById(Guid Id); 
 
