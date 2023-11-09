@@ -2,6 +2,6 @@
 {
     public class Material: BaseEntity
     {
-        public string DescripcionMaterial { get; set; }
+        public string DescripcionMaterial { get; set; } 
     }
 }
