@@ -50,6 +50,26 @@ namespace Infrastructure.Endpoint
             return new SqlCommand(query, sqlConnection);
         }
 
+        public async Task<int> ExecuteNonQueryCommandAsync(SqlCommand command)
+        {
+            OpenConnection();
+            command.Connection = sqlConnection;
+            int affectedRows = await command.ExecuteNonQueryAsync();
+            command.Dispose();
+            return affectedRows;
+        }
+
+        public async Task<DataTable> ExecuteQueryCommandAsync(SqlCommand command)
+        {
+            OpenConnection();
+            DataTable dt = new DataTable();
+            command.Connection = sqlConnection;
+            SqlDataReader reader = await command.ExecuteReaderAsync();
+            dt.Load(reader);
+            command.Dispose();
+            return dt;
+        }
+
         public T GetDataRowValue<T>(DataRow row, string column, T defaultValue = default)
         {
             return !row.IsNull(column) ? row.Field<T>(column) : defaultValue;

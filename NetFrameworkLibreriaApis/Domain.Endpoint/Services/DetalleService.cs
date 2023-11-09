@@ -32,9 +32,12 @@ namespace Domain.Endpoint.Services
             return newDetalle;
         }
 
-        public void EliminarDetalle(Guid Id)
+        public async Task<DetalleProducto> EliminarDetalle(Guid Id)
         {
-            _repository.Eliminar(Id);
+            //_repository.Eliminar(Id);
+            DetalleProducto detalle = await GetById(Id);
+            await _repository.Eliminar(detalle);
+            return detalle;
         }
 
         public Task<List<DetalleProducto>> GetAll()
@@ -42,14 +45,27 @@ namespace Domain.Endpoint.Services
            return _repository.Get();
         }
 
-        public void ModificarDetalle(Guid Id, DetalleProductoDTO cambioDetalle)
+        public async Task<DetalleProducto> ModificarDetalle(Guid Id, DetalleProductoDTO cambioDetalle)
         {
-            _repository.ModificarDetalle(Id, cambioDetalle);
+            //_repository.ModificarDetalle(Id, cambioDetalle);
+            DetalleProducto detalle = await GetById(Id);
+
+            DetalleProducto newDetalle = new DetalleProducto
+            {
+                Id = detalle.Id,
+                IdMarca = cambioDetalle.IdMarca,
+                IdMaterial = cambioDetalle.IdMaterial,
+                IdProducto = cambioDetalle.IdProducto,
+                IdUnidadMedida= cambioDetalle.IdUnidadMedida
+            };
+
+            await _repository.ModificarDetalle(newDetalle);
+            return newDetalle;
         }
 
-        public DetalleProducto GetById(Guid Id)
+        public async Task<DetalleProducto> GetById(Guid Id)
         {
-            return _repository.GetById(Id);
+            return await _repository.GetById(Id);
         }
     }
 }

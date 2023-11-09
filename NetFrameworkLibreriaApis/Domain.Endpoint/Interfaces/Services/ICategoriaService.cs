@@ -10,10 +10,10 @@ namespace Domain.Endpoint.Interfaces.Services
     {
         Task<List<Categoria>> GetAll();
 
-        Categoria GetById(Guid Id);
+        Task<Categoria> GetById(Guid Id);
 
         Categoria crearCategoria(CategoriaDTO nuevaCategoria);
 
-        void EliminarCategoria(Guid Id);
+        Task<Categoria> EliminarCategoria(Guid Id);
     }
 }

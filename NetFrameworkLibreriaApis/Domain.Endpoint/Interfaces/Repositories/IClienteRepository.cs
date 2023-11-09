@@ -10,12 +10,12 @@ namespace Domain.Endpoint.Interfaces.Repositories
     {
         Task<List<Cliente>> Get();
 
-        Cliente GetById(Guid Id);
+        Task<Cliente> GetById(Guid Id);
 
         void Create(Cliente cliente);
 
-        void Eliminar(Guid Id);
+        Task Eliminar(Cliente cliente);
 
-        void ModificarCliente(Guid Id, ClienteDTO modificarCliente);
+        Task ModificarCliente(Cliente modificarCliente);
     }
 }

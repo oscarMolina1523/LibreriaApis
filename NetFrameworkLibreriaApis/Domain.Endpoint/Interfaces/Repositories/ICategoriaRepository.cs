@@ -10,10 +10,10 @@ namespace Domain.Endpoint.Interfaces.Repositories
     {
         Task<List<Categoria>> Get();
 
-        Categoria GetById(Guid Id);
+        Task<Categoria> GetById(Guid Id);
 
         void Create(Categoria categoria);
 
-        void Eliminar(Guid Id);
+        Task Eliminar(Categoria categoria);
     }
 }

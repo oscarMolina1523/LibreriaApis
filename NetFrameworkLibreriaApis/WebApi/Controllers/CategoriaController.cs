@@ -27,9 +27,9 @@ namespace WebApi.Controllers
         }
 
         [HttpGet]
-        public IHttpActionResult GetCategoriaById(Guid Id)
+        public async Task<IHttpActionResult> GetCategoriaById(Guid Id)
         {
-            Categoria categoria = _CategoriaService.GetById(Id);
+            Categoria categoria =await _CategoriaService.GetById(Id);
             return Ok(categoria);
         }
 
@@ -47,9 +47,9 @@ namespace WebApi.Controllers
         }
 
         [HttpDelete]
-        public IHttpActionResult Eliminar(Guid Id)
+        public async Task<IHttpActionResult> Eliminar(Guid Id)
         {
-             _CategoriaService.EliminarCategoria(Id);
+            await _CategoriaService.EliminarCategoria(Id);
             return Ok("categoria eliminada");
         }
 

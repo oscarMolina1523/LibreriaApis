@@ -8,8 +8,10 @@ namespace Infrastructure.Endpoint
     {
         void CloseConnection();
         SqlDataAdapter CreateDataApdapter(string query);
+        Task<DataTable> ExecuteQueryCommandAsync(SqlCommand command);
         Task<DataTable> ExecuteQueryCommandAsync(string sql);
         SqlCommand GetCommand(string query);
+        Task<int> ExecuteNonQueryCommandAsync(SqlCommand command);
         T GetDataRowValue<T>(DataRow row, string index, T defaultValue = default);
         void OpenConnection();
     }

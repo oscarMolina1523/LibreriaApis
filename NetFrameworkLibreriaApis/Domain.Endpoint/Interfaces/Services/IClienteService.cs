@@ -10,12 +10,12 @@ namespace Domain.Endpoint.Interfaces.Services
     {
         Task<List<Cliente>> GetAll();
 
-        Cliente GetById(Guid Id);
+        Task<Cliente> GetById(Guid Id);
 
         Cliente CrearCliente(ClienteDTO nuevoCliente);
 
-        void EliminarCliente(Guid Id);
+        Task<Cliente> EliminarCliente(Guid Id);
 
-        void ModificarCliente(Guid Id, ClienteDTO cambioCliente);
+        Task<Cliente> ModificarCliente(Guid Id, ClienteDTO cambioCliente);
     }
 }

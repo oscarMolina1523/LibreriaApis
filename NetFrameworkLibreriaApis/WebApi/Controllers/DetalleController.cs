@@ -26,9 +26,9 @@ namespace WebApi.Controllers
         }
 
         [HttpGet]
-        public IHttpActionResult GetDetalleById(Guid Id)
+        public async Task<IHttpActionResult>  GetDetalleById(Guid Id)
         {
-            DetalleProducto detalle = _DetalleService.GetById(Id);
+            DetalleProducto detalle = await _DetalleService.GetById(Id);
             return Ok(detalle);
         }
 
@@ -46,16 +46,16 @@ namespace WebApi.Controllers
         }
 
         [HttpDelete]
-        public IHttpActionResult Eliminar(Guid Id)
+        public async Task<IHttpActionResult> Eliminar(Guid Id)
         {
-            _DetalleService.EliminarDetalle(Id);
+            await _DetalleService.EliminarDetalle(Id);
             return Ok("El detalle de producto fue eliminado");
         }
 
         [HttpPut]
-        public IHttpActionResult modificarDetalle(Guid Id, DetalleProductoDTO nuevosCampos)
+        public async Task<IHttpActionResult> modificarDetalle(Guid Id, DetalleProductoDTO nuevosCampos)
         {
-            _DetalleService.ModificarDetalle(Id, nuevosCampos);
+            await _DetalleService.ModificarDetalle(Id, nuevosCampos);
             return Ok("El detalle de producto ha sido modificado");
         }
 

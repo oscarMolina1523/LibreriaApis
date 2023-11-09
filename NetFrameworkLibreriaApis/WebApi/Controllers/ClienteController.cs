@@ -26,9 +26,9 @@ namespace WebApi.Controllers
         }
 
         [HttpGet]
-        public IHttpActionResult GetClienteById(Guid Id)
+        public async Task<IHttpActionResult> GetClienteById(Guid Id)
         {
-            Cliente cliente = _ClienteService.GetById(Id);
+            Cliente cliente = await _ClienteService.GetById(Id);
             return Ok(cliente);
         }
 
@@ -46,16 +46,16 @@ namespace WebApi.Controllers
         }
 
         [HttpDelete]
-        public IHttpActionResult Eliminar(Guid Id)
+        public async Task<IHttpActionResult> Eliminar(Guid Id)
         {
-            _ClienteService.EliminarCliente(Id);
+            await _ClienteService.EliminarCliente(Id);
             return Ok("cliente eliminado");
         }
 
         [HttpPut]
-        public IHttpActionResult modificarCliente(Guid Id, ClienteDTO nuevosCliente)
+        public async Task<IHttpActionResult> modificarCliente(Guid Id, ClienteDTO nuevosCliente)
         {
-            _ClienteService.ModificarCliente(Id, nuevosCliente);
+            await _ClienteService.ModificarCliente(Id, nuevosCliente);
             return Ok("El cliente ha sido modificado");
         }
 

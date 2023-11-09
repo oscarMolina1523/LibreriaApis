@@ -28,9 +28,13 @@ namespace Domain.Endpoint.Services
             return newCategoria;
         }
 
-        public void EliminarCategoria(Guid Id)
+        public async Task<Categoria> EliminarCategoria(Guid Id)
         {
-            _repository.Eliminar(Id);
+            //_repository.Eliminar(Id);
+
+            Categoria categoria = await GetById(Id);
+            await _repository.Eliminar(categoria);
+            return categoria;
         }
 
         public Task<List<Categoria>> GetAll()
@@ -38,9 +42,9 @@ namespace Domain.Endpoint.Services
             return  _repository.Get();
         }
 
-        public Categoria GetById(Guid Id)
+        public async Task<Categoria> GetById(Guid Id)
         {
-            return _repository.GetById(Id);
+            return await _repository.GetById(Id);
         }
     }
 }

@@ -1,5 +1,8 @@
 ﻿using Domain.Endpoint.Interfaces.Repositories;
+using Infrastructure.Endpoint.Builders;
 using Infrastructure.Endpoint.Data.Repositories;
+using Infrastructure.Endpoint.Interfaces;
+using Infrastructure.Endpoint.Services;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Infrastructure.Endpoint.Extensions
@@ -19,6 +22,8 @@ namespace Infrastructure.Endpoint.Extensions
             services.AddScoped<IUsuarioRepository, UsuarioRepository>();
             services.AddScoped<IProductoRepository, ProductoRepository>();
             services.AddScoped<IDetalleProductoRepository, DetalleProductoRepository>();
+            services.AddTransient<ISqlCommandOperationBuilder, SqlCommandOperationBuilder>();
+            services.AddSingleton<IEntitiesService, EntitiesService>();
             services.AddSingleton<ISingletonSqlConnection>(SingletonSqlConnection.GetInstance());
             return services;
         }
