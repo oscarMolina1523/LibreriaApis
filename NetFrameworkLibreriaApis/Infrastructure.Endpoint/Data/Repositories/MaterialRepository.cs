@@ -6,81 +6,65 @@ using System.Data.SqlClient;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
+using Infrastructure.Endpoint.Interfaces;
+using static Infrastructure.Endpoint.Builders.SqlOperations;
+using System.Text.RegularExpressions;
 
 namespace Infrastructure.Endpoint.Data.Repositories
 {
     class MaterialRepository : IMaterialRepository
     {
+        private readonly ISqlCommandOperationBuilder _operationBuilder;
         private readonly ISingletonSqlConnection _connectionBuilder;
 
-        public MaterialRepository(ISingletonSqlConnection connectionBuilder)
+        public MaterialRepository(ISingletonSqlConnection connectionBuilder, ISqlCommandOperationBuilder operationBuilder)
         {
             _connectionBuilder = connectionBuilder;
+            _operationBuilder = operationBuilder;
         }
 
         public void Create(Material material)
         {
-            string insertQuery = "INSERT INTO MATERIAL (ID_MATERIAL,DESCRIPCION_MATERIAL) VALUES(@ID, @Descripcion)";
-            SqlCommand sqlCommand = _connectionBuilder.GetCommand(insertQuery);
-            SqlParameter[] parameters = new SqlParameter[]
-            {
-                new SqlParameter() {
-                    Direction = ParameterDirection.Input,
-                    ParameterName = "@ID",
-                    SqlDbType = SqlDbType.UniqueIdentifier,
-                    Value = material.Id
-                },
-                new SqlParameter() {
-                    Direction = ParameterDirection.Input,
-                    ParameterName = "@Descripcion",
-                    SqlDbType = SqlDbType.NVarChar,
-                    Value = material.DescripcionMaterial
-                }
-            };
-            sqlCommand.Parameters.AddRange(parameters);
-            sqlCommand.ExecuteNonQuery();
+            SqlCommand writeCommand = _operationBuilder.From(material)
+                .WithOperation(SqlWriteOperation.Create)
+                .BuildWritter();
+            _connectionBuilder.ExecuteNonQueryCommandAsync(writeCommand);
         }
 
-        public void Eliminar(Guid Id)
+        public async Task Eliminar(Material material)
         {
-            string deleteQuery = "DELETE FROM MATERIAL WHERE ID_MATERIAL = @MaterialId;";
-            SqlCommand sqlCommand = _connectionBuilder.GetCommand(deleteQuery);
-            SqlParameter parameter = new SqlParameter()
-            {
-                Direction = ParameterDirection.Input,
-                ParameterName = "@MaterialId",
-                SqlDbType = SqlDbType.UniqueIdentifier,
-                Value = Id
-            };
-            sqlCommand.Parameters.Add(parameter);
-            sqlCommand.ExecuteNonQuery();
+            SqlCommand writeCommand = _operationBuilder.From(material)
+                 .WithOperation(SqlWriteOperation.Delete)
+                 .BuildWritter();
+            await _connectionBuilder.ExecuteNonQueryCommandAsync(writeCommand);
         }
 
         public async Task<List<Material>> Get()
         {
-            string query = "SELECT * FROM MATERIAL;";
-            DataTable dataTable = await _connectionBuilder.ExecuteQueryCommandAsync(query);
-            List<Material> material = dataTable.AsEnumerable()
-                .Select(MapEntityFromDataRow)
-                .ToList();
+            SqlCommand readCommand = _operationBuilder.Initialize<Material>()
+                .WithOperation(SqlReadOperation.Select)
+                .BuildReader();
+            DataTable dt = await _connectionBuilder.ExecuteQueryCommandAsync(readCommand);
+
+            List<Material> material = dt.AsEnumerable().Select(row =>
+            new Material
+            {
+                Id = row.Field<Guid>("ID_MATERIAL"),
+                DescripcionMaterial = row.Field<string>("DESCRIPCION_MATERIAL"),
+            }).ToList();
 
             return material;
         }
 
-        public Material GetById(Guid Id)
+        public async Task<Material> GetById(Guid Id)
         {
-            Material material = null;
-            string getQuery = "SELECT * FROM MATERIAL WHERE ID_MATERIAL = @MaterialId;";
-            SqlCommand sqlCommand = _connectionBuilder.GetCommand(getQuery);
-            SqlParameter parameter = new SqlParameter()
-            {
-                Direction = ParameterDirection.Input,
-                ParameterName = "@MaterialId",
-                SqlDbType = SqlDbType.UniqueIdentifier,
-                Value = Id
-            };
-            sqlCommand.Parameters.Add(parameter);
-            SqlDataReader reader = sqlCommand.ExecuteReader();
+            SqlCommand readCommand = _operationBuilder.Initialize<Material>()
+           .WithOperation(SqlReadOperation.SelectById)
+           .WithId(Id)
+           .BuildReader();
+            Material material = new Material();
+            await _connectionBuilder.ExecuteQueryCommandAsync(readCommand);
+            SqlDataReader reader = readCommand.ExecuteReader();
             if (reader.Read())
             {
                 material = new Material
@@ -91,7 +75,6 @@ namespace Infrastructure.Endpoint.Data.Repositories
             }
             reader.Close();
             return material;
-
         }
 
         private Material MapEntityFromDataRow(DataRow row)

@@ -30,9 +30,12 @@ namespace Domain.Endpoint.Services
             return newMaterial;
         }
 
-        public void EliminarMaterial(Guid Id)
+        public async Task<Material> EliminarMaterial(Guid Id)
         {
-            _repository.Eliminar(Id);
+            //_repository.Eliminar(Id);
+            Material material = await GetById(Id);
+            await _repository.Eliminar(material);
+            return material;
         }
 
         public Task<List<Material>> GetAll()
@@ -40,9 +43,9 @@ namespace Domain.Endpoint.Services
             return _repository.Get();
         }
 
-        public Material GetById(Guid Id)
+        public async Task<Material> GetById(Guid Id)
         {
-            return _repository.GetById(Id);
+            return await _repository.GetById(Id);
         }
     }
 }

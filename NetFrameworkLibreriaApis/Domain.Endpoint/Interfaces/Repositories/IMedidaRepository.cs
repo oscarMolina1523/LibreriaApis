@@ -9,10 +9,10 @@ namespace Domain.Endpoint.Interfaces.Repositories
     {
         Task<List<UnidadMedida>> Get();
 
-        UnidadMedida GetById(Guid Id);
+        Task<UnidadMedida> GetById(Guid Id);
 
         void Create(UnidadMedida medida);
 
-        void Eliminar(Guid Id);
+        Task Eliminar(UnidadMedida medida);
     }
 }

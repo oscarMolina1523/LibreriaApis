@@ -6,81 +6,64 @@ using System.Data.SqlClient;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
+using Infrastructure.Endpoint.Interfaces;
+using static Infrastructure.Endpoint.Builders.SqlOperations;
 
 namespace Infrastructure.Endpoint.Data.Repositories
 {
     public class MedidaRepository : IMedidaRepository
     {
+        private readonly ISqlCommandOperationBuilder _operationBuilder;
         private readonly ISingletonSqlConnection _connectionBuilder;
 
-        public MedidaRepository(ISingletonSqlConnection connectionBuilder)
+        public MedidaRepository(ISingletonSqlConnection connectionBuilder, ISqlCommandOperationBuilder operationBuilder)
         {
             _connectionBuilder = connectionBuilder;
+            _operationBuilder = operationBuilder;
         }
 
         public void Create(UnidadMedida medida)
         {
-            string insertQuery = "INSERT INTO UNIDAD_MEDIDA (ID_UNIDAD_MEDIDA,DESCRIPCION_MEDIDA) VALUES(@ID, @Descripcion)";
-            SqlCommand sqlCommand = _connectionBuilder.GetCommand(insertQuery);
-            SqlParameter[] parameters = new SqlParameter[]
-            {
-                new SqlParameter() {
-                    Direction = ParameterDirection.Input,
-                    ParameterName = "@ID",
-                    SqlDbType = SqlDbType.UniqueIdentifier,
-                    Value = medida.Id
-                },
-                new SqlParameter() {
-                    Direction = ParameterDirection.Input,
-                    ParameterName = "@Descripcion",
-                    SqlDbType = SqlDbType.NVarChar,
-                    Value = medida.DescripcionMedida
-                }
-            };
-            sqlCommand.Parameters.AddRange(parameters);
-            sqlCommand.ExecuteNonQuery();
+            SqlCommand writeCommand = _operationBuilder.From(medida)
+                .WithOperation(SqlWriteOperation.Create)
+                .BuildWritter();
+            _connectionBuilder.ExecuteNonQueryCommandAsync(writeCommand);
         }
 
-        public void Eliminar(Guid Id)
+        public async Task Eliminar(UnidadMedida medida)
         {
-            string deleteQuery = "DELETE FROM UNIDAD_MEDIDA WHERE ID_UNIDAD_MEDIDA = @MedidaId;";
-            SqlCommand sqlCommand = _connectionBuilder.GetCommand(deleteQuery);
-            SqlParameter parameter = new SqlParameter()
-            {
-                Direction = ParameterDirection.Input,
-                ParameterName = "@MedidaId",
-                SqlDbType = SqlDbType.UniqueIdentifier,
-                Value = Id
-            };
-            sqlCommand.Parameters.Add(parameter);
-            sqlCommand.ExecuteNonQuery();
+            SqlCommand writeCommand = _operationBuilder.From(medida)
+                  .WithOperation(SqlWriteOperation.Delete)
+                  .BuildWritter();
+            await _connectionBuilder.ExecuteNonQueryCommandAsync(writeCommand);
         }
 
         public async Task<List<UnidadMedida>> Get()
         {
-            string query = "SELECT * FROM UNIDAD_MEDIDA;";
-            DataTable dataTable = await _connectionBuilder.ExecuteQueryCommandAsync(query);
-            List<UnidadMedida> medida = dataTable.AsEnumerable()
-                .Select(MapEntityFromDataRow)
-                .ToList();
+            SqlCommand readCommand = _operationBuilder.Initialize<UnidadMedida>()
+                .WithOperation(SqlReadOperation.Select)
+                .BuildReader();
+            DataTable dt = await _connectionBuilder.ExecuteQueryCommandAsync(readCommand);
+
+            List<UnidadMedida> medida = dt.AsEnumerable().Select(row =>
+            new UnidadMedida
+            {
+                Id = row.Field<Guid>("ID_UNIDAD_MEDIDA"),
+                DescripcionMedida = row.Field<string>("DESCRIPCION_MEDIDA"),
+            }).ToList();
 
             return medida;
         }
 
-        public UnidadMedida GetById(Guid Id)
+        public async Task<UnidadMedida> GetById(Guid Id)
         {
-            UnidadMedida medida = null;
-            string getQuery = "SELECT * FROM UNIDAD_MEDIDA WHERE ID_UNIDAD_MEDIDA = @MedidaId;";
-            SqlCommand sqlCommand = _connectionBuilder.GetCommand(getQuery);
-            SqlParameter parameter = new SqlParameter()
-            {
-                Direction = ParameterDirection.Input,
-                ParameterName = "@MedidaId",
-                SqlDbType = SqlDbType.UniqueIdentifier,
-                Value = Id
-            };
-            sqlCommand.Parameters.Add(parameter);
-            SqlDataReader reader = sqlCommand.ExecuteReader();
+            SqlCommand readCommand = _operationBuilder.Initialize<UnidadMedida>()
+           .WithOperation(SqlReadOperation.SelectById)
+           .WithId(Id)
+           .BuildReader();
+            UnidadMedida medida = new UnidadMedida();
+            await _connectionBuilder.ExecuteQueryCommandAsync(readCommand);
+            SqlDataReader reader = readCommand.ExecuteReader();
             if (reader.Read())
             {
                 medida = new UnidadMedida
@@ -91,7 +74,6 @@ namespace Infrastructure.Endpoint.Data.Repositories
             }
             reader.Close();
             return medida;
-
         }
 
         private UnidadMedida MapEntityFromDataRow(DataRow row)

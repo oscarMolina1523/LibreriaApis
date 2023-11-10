@@ -30,9 +30,12 @@ namespace Domain.Endpoint.Services
             return newMedida;
         }
 
-        public void EliminarMedida(Guid Id)
+        public async Task<UnidadMedida> EliminarMedida(Guid Id)
         {
-            _repository.Eliminar(Id);
+            //_repository.Eliminar(Id);
+            UnidadMedida medida = await GetById(Id);
+            await _repository.Eliminar(medida);
+            return medida;
         }
 
         public Task<List<UnidadMedida>> GetAll()
@@ -41,9 +44,9 @@ namespace Domain.Endpoint.Services
             return _repository.Get();
         }
 
-        public UnidadMedida GetById(Guid Id)
+        public async Task<UnidadMedida> GetById(Guid Id)
         {
-            return _repository.GetById(Id);
+            return await _repository.GetById(Id);
         }
     }
 }

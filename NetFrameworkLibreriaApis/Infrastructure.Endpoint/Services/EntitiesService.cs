@@ -30,11 +30,15 @@ namespace Infrastructure.Endpoint.Services
             SqlEntitySettings detalleSettings = GetDetalleSettings();
             SqlEntitySettings empleadoSettings = GetEmpleadoSettings();
             SqlEntitySettings marcaSettings = GetMarcaSettings();
+            SqlEntitySettings medidaSettings = GetMedidaSettings();
+            SqlEntitySettings materialSettings = GetMaterialSettings();
             entities.Add(typeof(Categoria), categoriaSettings);
             entities.Add(typeof(Cliente), clientesSettings);
             entities.Add(typeof(DetalleProducto), detalleSettings);
             entities.Add(typeof(Empleado), empleadoSettings);
             entities.Add(typeof(Marca), marcaSettings);
+            entities.Add(typeof(UnidadMedida), medidaSettings);
+            entities.Add(typeof(Material), materialSettings);
         }
 
         private SqlEntitySettings GetCategoriaSettings()
@@ -116,6 +120,36 @@ namespace Infrastructure.Endpoint.Services
             return new SqlEntitySettings()
             {
                 TableName = "MARCA",
+                Columns = columns
+            };
+        }
+
+        private SqlEntitySettings GetMedidaSettings()
+        {
+            var columns = new List<SqlColumnSettings>()
+            {
+                new SqlColumnSettings() { Name = "ID_UNIDAD_MEDIDA", DomainName = "Id", IsPrimaryKey = true, SqlDbType = SqlDbType.UniqueIdentifier },
+                new SqlColumnSettings() { Name = "DESCRIPCION_MEDIDA", DomainName = "DescripcionMedida", SqlDbType = SqlDbType.NVarChar }
+            };
+
+            return new SqlEntitySettings()
+            {
+                TableName = "UNIDAD_MEDIDA",
+                Columns = columns
+            };
+        }
+
+        private SqlEntitySettings GetMaterialSettings()
+        {
+            var columns = new List<SqlColumnSettings>()
+            {
+                new SqlColumnSettings() { Name = "ID_MATERIAL", DomainName = "Id", IsPrimaryKey = true, SqlDbType = SqlDbType.UniqueIdentifier },
+                new SqlColumnSettings() { Name = "DESCRIPCION_MATERIAL", DomainName = "DescripcionMaterial", SqlDbType = SqlDbType.NVarChar }
+            };
+
+            return new SqlEntitySettings()
+            {
+                TableName = "MATERIAL",
                 Columns = columns
             };
         }

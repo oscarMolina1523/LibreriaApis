@@ -25,9 +25,9 @@ namespace WebApi.Controllers
         }
 
         [HttpGet]
-        public IHttpActionResult GetMaterialById(Guid Id)
+        public async Task<IHttpActionResult> GetMaterialById(Guid Id)
         {
-            Material material = _materialService.GetById(Id);
+            Material material =await _materialService.GetById(Id);
             return Ok(material);
         }
 
@@ -46,9 +46,9 @@ namespace WebApi.Controllers
         }
 
         [HttpDelete]
-        public IHttpActionResult Eliminar(Guid Id)
+        public async Task<IHttpActionResult> Eliminar(Guid Id)
         {
-            _materialService.EliminarMaterial(Id);
+            await _materialService.EliminarMaterial(Id);
             return Ok();
         }
     }

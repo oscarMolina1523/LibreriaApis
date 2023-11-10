@@ -26,9 +26,9 @@ namespace WebApi.Controllers
         }
 
         [HttpGet]
-        public IHttpActionResult GetMedidaById(Guid Id)
+        public async Task<IHttpActionResult> GetMedidaById(Guid Id)
         {
-            UnidadMedida medida = _MedidaService.GetById(Id);
+            UnidadMedida medida = await _MedidaService.GetById(Id);
             return Ok(medida);
         }
 
@@ -46,9 +46,9 @@ namespace WebApi.Controllers
         }
 
         [HttpDelete]
-        public IHttpActionResult Eliminar(Guid Id)
+        public async Task<IHttpActionResult> Eliminar(Guid Id)
         {
-            _MedidaService.EliminarMedida(Id);
+            await _MedidaService.EliminarMedida(Id);
             return Ok();
         }
     }

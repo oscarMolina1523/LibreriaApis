@@ -10,10 +10,10 @@ namespace Domain.Endpoint.Interfaces.Services
     {
         Task<List<Material>> GetAll();
 
-        Material GetById(Guid Id);
+        Task<Material> GetById(Guid Id);
 
         Material CrearMaterial(MaterialDTO nuevaMaterial);
 
-        void EliminarMaterial(Guid Id);
+        Task<Material> EliminarMaterial(Guid Id);
     }
 }

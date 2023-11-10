@@ -10,10 +10,10 @@ namespace Domain.Endpoint.Interfaces.Services
     {
         Task<List<UnidadMedida>> GetAll();
 
-        UnidadMedida GetById(Guid Id);
+        Task<UnidadMedida> GetById(Guid Id);
 
         UnidadMedida CrearMedida(UnidadMedidaDTO nuevaMedida);
 
-        void EliminarMedida(Guid Id);
+        Task<UnidadMedida> EliminarMedida(Guid Id);
     }
 }
