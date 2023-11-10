@@ -8,7 +8,7 @@ namespace Domain.Endpoint.Interfaces.Repositories
 {
     public interface IProductoRepository
     {
-        Task<List<Producto>> Get();
+        Task<List<Producto>> Get(); 
 
         Producto GetById(Guid Id);
 
