@@ -32,6 +32,8 @@ namespace Infrastructure.Endpoint.Services
             SqlEntitySettings marcaSettings = GetMarcaSettings();
             SqlEntitySettings medidaSettings = GetMedidaSettings();
             SqlEntitySettings materialSettings = GetMaterialSettings();
+            SqlEntitySettings productoSettings = GetProductoSettings();
+            SqlEntitySettings proveedorSettings = GetProveedorSettings();
             entities.Add(typeof(Categoria), categoriaSettings);
             entities.Add(typeof(Cliente), clientesSettings);
             entities.Add(typeof(DetalleProducto), detalleSettings);
@@ -39,6 +41,8 @@ namespace Infrastructure.Endpoint.Services
             entities.Add(typeof(Marca), marcaSettings);
             entities.Add(typeof(UnidadMedida), medidaSettings);
             entities.Add(typeof(Material), materialSettings);
+            entities.Add(typeof(Producto), productoSettings);
+            entities.Add(typeof(Proveedor), proveedorSettings);
         }
 
         private SqlEntitySettings GetCategoriaSettings()
@@ -150,6 +154,40 @@ namespace Infrastructure.Endpoint.Services
             return new SqlEntitySettings()
             {
                 TableName = "MATERIAL",
+                Columns = columns
+            };
+        }
+
+        private SqlEntitySettings GetProductoSettings()
+        {
+            var columns = new List<SqlColumnSettings>()
+            {
+                new SqlColumnSettings() { Name = "ID_PRODUCTO", DomainName = "Id", IsPrimaryKey = true, SqlDbType = SqlDbType.UniqueIdentifier },
+                new SqlColumnSettings() { Name = "ID_CATEGORIA", DomainName = "IdCategoria", SqlDbType = SqlDbType.UniqueIdentifier },
+                new SqlColumnSettings() { Name = "DESCRIPCION_PRODUCTO", DomainName = "DescripcionProducto", SqlDbType = SqlDbType.NVarChar },
+            };
+
+            return new SqlEntitySettings()
+            {
+                TableName = "PRODUCTO",
+                Columns = columns
+            };
+        }
+
+        private SqlEntitySettings GetProveedorSettings()
+        {
+            var columns = new List<SqlColumnSettings>()
+            {
+                new SqlColumnSettings() { Name = "ID_PROVEEDOR", DomainName = "Id", IsPrimaryKey = true, SqlDbType = SqlDbType.UniqueIdentifier },
+                new SqlColumnSettings() { Name = "DIRECCION", DomainName = "Direccion", SqlDbType = SqlDbType.NVarChar },
+                new SqlColumnSettings() { Name = "CORREO_ELECTRONICO", DomainName = "CorreoElectronico", SqlDbType = SqlDbType.NVarChar },
+                new SqlColumnSettings() { Name = "TELEFONO", DomainName = "Telefono", SqlDbType = SqlDbType.NVarChar },
+                new SqlColumnSettings() { Name = "DESCRIPCION_PROVEEDOR", DomainName = "Descripcion", SqlDbType = SqlDbType.NVarChar }
+            };
+
+            return new SqlEntitySettings()
+            {
+                TableName = "PROVEEDOR",
                 Columns = columns
             };
         }

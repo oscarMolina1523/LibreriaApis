@@ -7,129 +7,85 @@ using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using Domain.Endpoint.Dtos;
+using Infrastructure.Endpoint.Interfaces;
+using static Infrastructure.Endpoint.Builders.SqlOperations;
 
 namespace Infrastructure.Endpoint.Data.Repositories
 {
     public class ProductoRepository : IProductoRepository
     {
+        private readonly ISqlCommandOperationBuilder _operationBuilder;
         private readonly ISingletonSqlConnection _connectionBuilder;
 
-        public ProductoRepository(ISingletonSqlConnection connectionBuilder)
+        public ProductoRepository(ISingletonSqlConnection connectionBuilder, ISqlCommandOperationBuilder operationBuilder)
         {
             _connectionBuilder = connectionBuilder;
+            _operationBuilder = operationBuilder;
         }
 
         public void Create(Producto producto)
         {
-            string insertQuery = "INSERT INTO PRODUCTO (ID_PRODUCTO,DESCRIPCION_PRODUCTO,ID_CATEGORIA) VALUES(@ID, @Descripcion, @IdCategoria)";
-            SqlCommand sqlCommand = _connectionBuilder.GetCommand(insertQuery);
-            SqlParameter[] parameters = new SqlParameter[]
-            {
-                new SqlParameter() {
-                    Direction = ParameterDirection.Input,
-                    ParameterName = "@ID",
-                    SqlDbType = SqlDbType.UniqueIdentifier,
-                    Value = producto.Id
-                },
-                new SqlParameter() {
-                    Direction = ParameterDirection.Input,
-                    ParameterName = "@Descripcion",
-                    SqlDbType = SqlDbType.NVarChar,
-                    Value = producto.DescripcionProducto
-                },
-                new SqlParameter() {
-                    Direction = ParameterDirection.Input,
-                    ParameterName = "@IdCategoria",
-                    SqlDbType = SqlDbType.UniqueIdentifier,
-                    Value = producto.IdCategoria
-                }
-            };
-            sqlCommand.Parameters.AddRange(parameters);
-            sqlCommand.ExecuteNonQuery();
+            SqlCommand writeCommand = _operationBuilder.From(producto)
+                .WithOperation(SqlWriteOperation.Create)
+                .BuildWritter();
+            _connectionBuilder.ExecuteNonQueryCommandAsync(writeCommand);
         }
 
-        public void Eliminar(Guid Id)
+        public async Task Eliminar(Producto producto)
         {
-            string deleteQuery = "DELETE FROM PRODUCTO WHERE ID_PRODUCTO = @ProductoId;";
-            SqlCommand sqlCommand = _connectionBuilder.GetCommand(deleteQuery);
-            SqlParameter parameter = new SqlParameter()
-            {
-                Direction = ParameterDirection.Input,
-                ParameterName = "@ProductoId",
-                SqlDbType = SqlDbType.UniqueIdentifier,
-                Value = Id
-            };
-            sqlCommand.Parameters.Add(parameter);
-            sqlCommand.ExecuteNonQuery();
+            SqlCommand writeCommand = _operationBuilder.From(producto)
+                .WithOperation(SqlWriteOperation.Delete)
+                .BuildWritter();
+            await _connectionBuilder.ExecuteNonQueryCommandAsync(writeCommand);
         }
 
         public async Task<List<Producto>> Get()
         {
-            string query = "SELECT * FROM PRODUCTO;";
-            DataTable dataTable = await _connectionBuilder.ExecuteQueryCommandAsync(query);
-            List<Producto> producto = dataTable.AsEnumerable()
-                .Select(MapEntityFromDataRow)
-                .ToList();
+            SqlCommand readCommand = _operationBuilder.Initialize<Producto>()
+               .WithOperation(SqlReadOperation.Select)
+               .BuildReader();
+            DataTable dt = await _connectionBuilder.ExecuteQueryCommandAsync(readCommand);
 
-            return producto;
-        }
-
-        public void ModificarProducto(Guid Id, ProductoDTO modificarProducto)
-        {
-            string updateQuery = "UPDATE PRODUCTO SET DESCRIPCION_PRODUCTO = @Descripcion, ID_CATEGORIA= @IdCategoria WHERE ID_PRODUCTO = @Id;";
-            SqlCommand sqlCommand = _connectionBuilder.GetCommand(updateQuery);
-            SqlParameter[] parameters = new SqlParameter[]
+            List<Producto> productos = dt.AsEnumerable().Select(row =>
+            new Producto
             {
-                new SqlParameter() {
-                    Direction = ParameterDirection.Input,
-                    ParameterName = "@Id",
-                    SqlDbType = SqlDbType.UniqueIdentifier,
-                    Value = Id
-                },
-                new SqlParameter() {
-                    Direction = ParameterDirection.Input,
-                    ParameterName = "@Descripcion",
-                    SqlDbType = SqlDbType.NVarChar,
-                    Value = modificarProducto.DescripcionProducto
-                },
-                new SqlParameter() {
-                    Direction = ParameterDirection.Input,
-                    ParameterName = "@IdCategoria",
-                    SqlDbType = SqlDbType.UniqueIdentifier,
-                    Value = modificarProducto.IdCategoria
-                },
+                Id = row.Field<Guid>("ID_PRODUCTO"),
+                IdCategoria = row.Field<Guid>("ID_CATEGORIA"),
+                DescripcionProducto = row.Field<string>("DESCRIPCION_PRODUCTO"),
                 
-            };
-            sqlCommand.Parameters.AddRange(parameters);
-            sqlCommand.ExecuteNonQuery();
+            }).ToList();
+
+            return productos;
         }
 
-        public Producto GetById(Guid Id)
+        public async Task ModificarProducto(Producto modificarProducto)
         {
-            Producto producto = null;
-            string getQuery = "SELECT * FROM PRODUCTO WHERE ID_PRODUCTO = @ProductoId;";
-            SqlCommand sqlCommand = _connectionBuilder.GetCommand(getQuery);
-            SqlParameter parameter = new SqlParameter()
-            {
-                Direction = ParameterDirection.Input,
-                ParameterName = "@ProductoId",
-                SqlDbType = SqlDbType.UniqueIdentifier,
-                Value = Id
-            };
-            sqlCommand.Parameters.Add(parameter);
-            SqlDataReader reader = sqlCommand.ExecuteReader();
+            SqlCommand writeCommand = _operationBuilder.From(modificarProducto)
+               .WithOperation(SqlWriteOperation.Update)
+               .BuildWritter();
+            await _connectionBuilder.ExecuteNonQueryCommandAsync(writeCommand);
+        }
+
+        public async Task<Producto> GetById(Guid Id)
+        {
+            SqlCommand readCommand = _operationBuilder.Initialize<Producto>()
+             .WithOperation(SqlReadOperation.SelectById)
+             .WithId(Id)
+             .BuildReader();
+            Producto producto = new Producto();
+            await _connectionBuilder.ExecuteQueryCommandAsync(readCommand);
+            SqlDataReader reader = readCommand.ExecuteReader();
             if (reader.Read())
             {
                 producto = new Producto
                 {
                     Id = reader.GetGuid(reader.GetOrdinal("ID_PRODUCTO")),
-                    DescripcionProducto = reader.GetString(reader.GetOrdinal("DESCRIPCION_PRODUCTO")),
                     IdCategoria = reader.GetGuid(reader.GetOrdinal("ID_CATEGORIA")),
+                    DescripcionProducto = reader.GetString(reader.GetOrdinal("DESCRIPCION_PRODUCTO")),
                 };
             }
             reader.Close();
             return producto;
-
         }
 
         private Producto MapEntityFromDataRow(DataRow row)

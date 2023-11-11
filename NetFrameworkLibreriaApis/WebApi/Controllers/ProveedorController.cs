@@ -26,9 +26,9 @@ namespace WebApi.Controllers
         }
 
         [HttpGet]
-        public IHttpActionResult GetProveedorById(Guid Id)
+        public async Task<IHttpActionResult> GetProveedorById(Guid Id)
         {
-            Proveedor proveedor = _ProveedorService.GetById(Id);
+            Proveedor proveedor = await _ProveedorService.GetById(Id);
             return Ok(proveedor);
         }
 
@@ -46,16 +46,16 @@ namespace WebApi.Controllers
         }
 
         [HttpDelete]
-        public IHttpActionResult Eliminar(Guid Id)
+        public async Task<IHttpActionResult> Eliminar(Guid Id)
         {
-            _ProveedorService.EliminarProveedor(Id);
+            await _ProveedorService.EliminarProveedor(Id);
             return Ok("proveedor eliminado");
         }
 
         [HttpPut]
-        public IHttpActionResult modificarProveedor(Guid Id, ProveedorDTO nuevosCampos)
+        public async Task<IHttpActionResult> modificarProveedor(Guid Id, ProveedorDTO nuevosCampos)
         {
-            _ProveedorService.ModificarProveedor(Id, nuevosCampos);
+            await _ProveedorService.ModificarProveedor(Id, nuevosCampos);
             return Ok("El proveedor ha sido modificado");
         }
 

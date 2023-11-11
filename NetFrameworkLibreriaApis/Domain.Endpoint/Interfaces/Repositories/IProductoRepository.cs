@@ -10,12 +10,12 @@ namespace Domain.Endpoint.Interfaces.Repositories
     {
         Task<List<Producto>> Get(); 
 
-        Producto GetById(Guid Id);
+        Task<Producto> GetById(Guid Id);
 
         void Create(Producto producto);
 
-        void Eliminar(Guid Id);
+        Task Eliminar(Producto producto);
 
-        void ModificarProducto(Guid Id, ProductoDTO modificarProducto);
+        Task ModificarProducto(Producto modificarProducto);
     }
 }

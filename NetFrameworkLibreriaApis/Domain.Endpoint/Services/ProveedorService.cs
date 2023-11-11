@@ -32,9 +32,12 @@ namespace Domain.Endpoint.Services
             return newProveedor;
         }
 
-        public void EliminarProveedor(Guid Id)
+        public async Task<Proveedor> EliminarProveedor(Guid Id)
         {
-            _repository.Eliminar(Id);
+            //_repository.Eliminar(Id);
+            Proveedor proveedor = await GetById(Id);
+            await _repository.Eliminar(proveedor);
+            return proveedor;
         }
 
         public Task<List<Proveedor>> GetAll()
@@ -42,14 +45,27 @@ namespace Domain.Endpoint.Services
             return _repository.Get();
         }
 
-        public void ModificarProveedor(Guid Id, ProveedorDTO cambioProveedor)
+        public async Task<Proveedor> ModificarProveedor(Guid Id, ProveedorDTO cambioProveedor)
         {
-            _repository.ModificarProveedor(Id, cambioProveedor);
+            //_repository.ModificarProveedor(Id, cambioProveedor);
+            Proveedor proveedor = await GetById(Id);
+
+            Proveedor newProveedor = new Proveedor
+            {
+                Id = proveedor.Id,
+                Direccion=cambioProveedor.Direccion,
+                Descripcion=cambioProveedor.Descripcion,
+                Telefono=cambioProveedor.Telefono,
+                CorreoElectronico=cambioProveedor.CorreoElectronico
+            };
+
+            await _repository.ModificarProveedor(newProveedor);
+            return newProveedor;
         }
 
-        public Proveedor GetById(Guid Id)
+        public async Task<Proveedor> GetById(Guid Id)
         {
-            return _repository.GetById(Id);
+            return await _repository.GetById(Id);
         }
     }
 }

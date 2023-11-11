@@ -10,12 +10,12 @@ namespace Domain.Endpoint.Interfaces.Services
     {
         Task<List<Proveedor>> GetAll();
 
-        Proveedor GetById(Guid Id);
+        Task<Proveedor> GetById(Guid Id);
 
         Proveedor CrearProveedor(ProveedorDTO nuevoProveedor);
 
-        void EliminarProveedor(Guid Id);
+        Task<Proveedor> EliminarProveedor(Guid Id);
 
-        void ModificarProveedor(Guid Id, ProveedorDTO cambioProveedor);
+        Task<Proveedor> ModificarProveedor(Guid Id, ProveedorDTO cambioProveedor);
     }
 }

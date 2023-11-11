@@ -26,9 +26,9 @@ namespace WebApi.Controllers
         }
 
         [HttpGet]
-        public IHttpActionResult GetProductoById(Guid Id)
+        public async Task<IHttpActionResult> GetProductoById(Guid Id)
         {
-            Producto producto = _ProductoService.GetById(Id);
+            Producto producto = await _ProductoService.GetById(Id);
             return Ok(producto);
         }
 
@@ -46,16 +46,16 @@ namespace WebApi.Controllers
         }
 
         [HttpDelete]
-        public IHttpActionResult Eliminar(Guid Id)
+        public async Task<IHttpActionResult> Eliminar(Guid Id)
         {
-            _ProductoService.EliminarProducto(Id);
+            await _ProductoService.EliminarProducto(Id);
             return Ok();
         }
 
         [HttpPut]
-        public IHttpActionResult modificarProducto(Guid Id, ProductoDTO nuevosCampos)
+        public async Task<IHttpActionResult> modificarProducto(Guid Id, ProductoDTO nuevosCampos)
         {
-            _ProductoService.ModificarProducto(Id, nuevosCampos);
+            await _ProductoService.ModificarProducto(Id, nuevosCampos);
             return Ok("El producto ha sido modificado");
         }
     }
