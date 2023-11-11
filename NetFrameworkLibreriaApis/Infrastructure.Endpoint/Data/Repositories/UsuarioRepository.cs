@@ -7,140 +7,75 @@ using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using Domain.Endpoint.Dtos;
+using Infrastructure.Endpoint.Interfaces;
+using static Infrastructure.Endpoint.Builders.SqlOperations;
 
 namespace Infrastructure.Endpoint.Data.Repositories
 {
     public class UsuarioRepository : IUsuarioRepository
     {
+        private readonly ISqlCommandOperationBuilder _operationBuilder;
         private readonly ISingletonSqlConnection _connectionBuilder;
 
-        public UsuarioRepository(ISingletonSqlConnection connectionBuilder)
+        public UsuarioRepository(ISingletonSqlConnection connectionBuilder, ISqlCommandOperationBuilder operationBuilder)
         {
             _connectionBuilder = connectionBuilder;
+            _operationBuilder = operationBuilder;
         }
 
         public void Create(Usuario usuario)
         {
-            string insertQuery = "INSERT INTO USUARIO (ID_USUARIO,ID_ROLES, ID_EMPLEADO,NOMBRE_USUARIO, CONTRASEÑA) VALUES(@ID, @IdRoles, @IdEmpleado,@NombreUsuario,  @Contraseña)";
-            SqlCommand sqlCommand = _connectionBuilder.GetCommand(insertQuery);
-            SqlParameter[] parameters = new SqlParameter[]
-            {
-                new SqlParameter() {
-                    Direction = ParameterDirection.Input,
-                    ParameterName = "@ID",
-                    SqlDbType = SqlDbType.UniqueIdentifier,
-                    Value = usuario.Id
-                },
-                new SqlParameter() {
-                    Direction = ParameterDirection.Input,
-                    ParameterName = "@IdRoles",
-                    SqlDbType = SqlDbType.UniqueIdentifier,
-                    Value = usuario.IdRol
-                },
-                new SqlParameter() {
-                    Direction = ParameterDirection.Input,
-                    ParameterName = "@IdEmpleado",
-                    SqlDbType = SqlDbType.UniqueIdentifier,
-                    Value = usuario.IdEmpleado
-                },
-                new SqlParameter() {
-                    Direction = ParameterDirection.Input,
-                    ParameterName = "@NombreUsuario",
-                    SqlDbType = SqlDbType.NVarChar,
-                    Value = usuario.NombreUsuario
-                },
-                new SqlParameter() {
-                    Direction = ParameterDirection.Input,
-                    ParameterName = "@Contraseña",
-                    SqlDbType = SqlDbType.NVarChar,
-                    Value = usuario.Contraseña
-                }
-            };
-            sqlCommand.Parameters.AddRange(parameters);
-            sqlCommand.ExecuteNonQuery();
+            SqlCommand writeCommand = _operationBuilder.From(usuario)
+                .WithOperation(SqlWriteOperation.Create)
+                .BuildWritter();
+            _connectionBuilder.ExecuteNonQueryCommandAsync(writeCommand);
         }
 
-        public void Eliminar(Guid Id)
+        public async Task Eliminar(Usuario usuario)
         {
-            string deleteQuery = "DELETE FROM USUARIO WHERE ID_USUARIO = @UsuarioId;";
-            SqlCommand sqlCommand = _connectionBuilder.GetCommand(deleteQuery);
-            SqlParameter parameter = new SqlParameter()
-            {
-                Direction = ParameterDirection.Input,
-                ParameterName = "@UsuarioId",
-                SqlDbType = SqlDbType.UniqueIdentifier,
-                Value = Id
-            };
-            sqlCommand.Parameters.Add(parameter);
-            sqlCommand.ExecuteNonQuery();
+            SqlCommand writeCommand = _operationBuilder.From(usuario)
+                .WithOperation(SqlWriteOperation.Delete)
+                .BuildWritter();
+            await _connectionBuilder.ExecuteNonQueryCommandAsync(writeCommand);
         }
 
         public async Task<List<Usuario>> Get()
         {
-            string query = "SELECT * FROM USUARIO;";
-            DataTable dataTable = await _connectionBuilder.ExecuteQueryCommandAsync(query);
-            List<Usuario> usuario = dataTable.AsEnumerable()
-                .Select(MapEntityFromDataRow)
-                .ToList();
+            SqlCommand readCommand = _operationBuilder.Initialize<Usuario>()
+                .WithOperation(SqlReadOperation.Select)
+                .BuildReader();
+            DataTable dt = await _connectionBuilder.ExecuteQueryCommandAsync(readCommand);
 
-            return usuario;
+            List<Usuario> usuarios = dt.AsEnumerable().Select(row =>
+            new Usuario
+            {
+                Id = row.Field<Guid>("ID_USUARIO"),
+                IdEmpleado = row.Field<Guid>("ID_EMPLEADO"),
+                IdRol = row.Field<Guid>("ID_ROLES"),
+                NombreUsuario = row.Field<string>("NOMBRE_USUARIO"),
+                Contraseña = row.Field<string>("CONTRASEÑA"),
+            }).ToList();
+
+            return usuarios;
         }
 
-        public void ModificarUsuario(Guid Id, UsuarioDTO modificarUsuario)
+        public async Task ModificarUsuario(Usuario modificarUsuario)
         {
-            string updateQuery = "UPDATE USUARIO SET ID_EMPLEADO = @IdEmpleado, ID_ROLES = @IdRol, NOMBRE_USUARIO=@NombreUsuario, CONTRASEÑA=@Contraseña WHERE ID_USUARIO = @Id;";
-            SqlCommand sqlCommand = _connectionBuilder.GetCommand(updateQuery);
-            SqlParameter[] parameters = new SqlParameter[]
-            {
-                new SqlParameter() {
-                    Direction = ParameterDirection.Input,
-                    ParameterName = "@Id",
-                    SqlDbType = SqlDbType.UniqueIdentifier,
-                    Value = Id
-                },
-                new SqlParameter() {
-                    Direction = ParameterDirection.Input,
-                    ParameterName = "@IdEmpleado",
-                    SqlDbType = SqlDbType.UniqueIdentifier,
-                    Value = modificarUsuario.IdEmpleado
-                },
-                new SqlParameter() {
-                    Direction = ParameterDirection.Input,
-                    ParameterName = "@IdRol",
-                    SqlDbType = SqlDbType.UniqueIdentifier,
-                    Value = modificarUsuario.IdRol
-                },
-                new SqlParameter() {
-                    Direction = ParameterDirection.Input,
-                    ParameterName = "@NombreUsuario",
-                    SqlDbType = SqlDbType.NVarChar,
-                    Value = modificarUsuario.NombreUsuario
-                },
-                new SqlParameter() {
-                    Direction = ParameterDirection.Input,
-                    ParameterName = "@Contraseña",
-                    SqlDbType = SqlDbType.NVarChar,
-                    Value = modificarUsuario.Contraseña
-                },
-            };
-            sqlCommand.Parameters.AddRange(parameters);
-            sqlCommand.ExecuteNonQuery();
+            SqlCommand writeCommand = _operationBuilder.From(modificarUsuario)
+               .WithOperation(SqlWriteOperation.Update)
+               .BuildWritter();
+            await _connectionBuilder.ExecuteNonQueryCommandAsync(writeCommand);
         }
 
-        public Usuario GetById(Guid Id)
+        public async Task<Usuario> GetById(Guid Id)
         {
-            Usuario usuario = null;
-            string getQuery = "SELECT * FROM USUARIO WHERE ID_USUARIO = @UsuarioId;";
-            SqlCommand sqlCommand = _connectionBuilder.GetCommand(getQuery);
-            SqlParameter parameter = new SqlParameter()
-            {
-                Direction = ParameterDirection.Input,
-                ParameterName = "@UsuarioId",
-                SqlDbType = SqlDbType.UniqueIdentifier,
-                Value = Id
-            };
-            sqlCommand.Parameters.Add(parameter);
-            SqlDataReader reader = sqlCommand.ExecuteReader();
+            SqlCommand readCommand = _operationBuilder.Initialize<Usuario>()
+            .WithOperation(SqlReadOperation.SelectById)
+            .WithId(Id)
+            .BuildReader();
+            Usuario usuario = new Usuario();
+            await _connectionBuilder.ExecuteQueryCommandAsync(readCommand);
+            SqlDataReader reader = readCommand.ExecuteReader();
             if (reader.Read())
             {
                 usuario = new Usuario

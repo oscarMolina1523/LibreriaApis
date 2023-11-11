@@ -10,10 +10,10 @@ namespace Domain.Endpoint.Interfaces.Services
     {
         Task<List<Rol>> GetAll();
 
-        Rol GetById(Guid Id);
+        Task<Rol> GetById(Guid Id);
 
         Rol CrearRol(RolDTO nuevoRol);
 
-        void EliminarRol(Guid Id);
+        Task<Rol> EliminarRol(Guid Id);
     }
 }

@@ -34,6 +34,8 @@ namespace Infrastructure.Endpoint.Services
             SqlEntitySettings materialSettings = GetMaterialSettings();
             SqlEntitySettings productoSettings = GetProductoSettings();
             SqlEntitySettings proveedorSettings = GetProveedorSettings();
+            SqlEntitySettings rolSettings = GetRolSettings();
+            SqlEntitySettings usuarioSettings = GetUsuarioSettings();
             entities.Add(typeof(Categoria), categoriaSettings);
             entities.Add(typeof(Cliente), clientesSettings);
             entities.Add(typeof(DetalleProducto), detalleSettings);
@@ -43,6 +45,8 @@ namespace Infrastructure.Endpoint.Services
             entities.Add(typeof(Material), materialSettings);
             entities.Add(typeof(Producto), productoSettings);
             entities.Add(typeof(Proveedor), proveedorSettings);
+            entities.Add(typeof(Rol), rolSettings);
+            entities.Add(typeof(Usuario), usuarioSettings);
         }
 
         private SqlEntitySettings GetCategoriaSettings()
@@ -188,6 +192,40 @@ namespace Infrastructure.Endpoint.Services
             return new SqlEntitySettings()
             {
                 TableName = "PROVEEDOR",
+                Columns = columns
+            };
+        }
+
+        private SqlEntitySettings GetRolSettings()
+        {
+            var columns = new List<SqlColumnSettings>()
+            {
+                new SqlColumnSettings() { Name = "ID_ROLES", DomainName = "Id", IsPrimaryKey = true, SqlDbType = SqlDbType.UniqueIdentifier },
+                new SqlColumnSettings() { Name = "DESCRIPCION_ROLES", DomainName = "DescripcionRol", SqlDbType = SqlDbType.NVarChar }
+            };
+
+            return new SqlEntitySettings()
+            {
+                TableName = "ROLES",
+                Columns = columns
+            };
+        }
+
+
+        private SqlEntitySettings GetUsuarioSettings()
+        {
+            var columns = new List<SqlColumnSettings>()
+            {
+                new SqlColumnSettings() { Name = "ID_USUARIO", DomainName = "Id", IsPrimaryKey = true, SqlDbType = SqlDbType.UniqueIdentifier },
+                new SqlColumnSettings() { Name = "ID_ROLES", DomainName = "IdRol", SqlDbType = SqlDbType.UniqueIdentifier },
+                new SqlColumnSettings() { Name = "ID_EMPLEADO", DomainName = "IdEmpleado", SqlDbType = SqlDbType.UniqueIdentifier },
+                new SqlColumnSettings() { Name = "NOMBRE_USUARIO", DomainName = "NombreUsuario", SqlDbType = SqlDbType.NVarChar },
+                new SqlColumnSettings() { Name = "CONTRASEÑA", DomainName = "Contraseña", SqlDbType = SqlDbType.NVarChar },
+            };
+
+            return new SqlEntitySettings()
+            {
+                TableName = "USUARIO",
                 Columns = columns
             };
         }

@@ -26,9 +26,9 @@ namespace WebApi.Controllers
         }
 
         [HttpGet]
-        public IHttpActionResult GetRolById(Guid Id)
+        public async Task<IHttpActionResult> GetRolById(Guid Id)
         {
-            Rol rol = _rolService.GetById(Id);
+            Rol rol = await _rolService.GetById(Id);
             return Ok(rol);
         }
 
@@ -46,9 +46,9 @@ namespace WebApi.Controllers
         }
 
         [HttpDelete]
-        public IHttpActionResult Eliminar(Guid Id)
+        public async Task<IHttpActionResult> Eliminar(Guid Id)
         {
-            _rolService.EliminarRol(Id);
+            await _rolService.EliminarRol(Id);
             return Ok();
         }
     }

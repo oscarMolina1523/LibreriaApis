@@ -33,9 +33,12 @@ namespace Domain.Endpoint.Services
             return newUsuario;
         }
 
-        public void EliminarUsuario(Guid Id)
+        public async Task<Usuario> EliminarUsuario(Guid Id)
         {
-            _repository.Eliminar(Id);
+            //_repository.Eliminar(Id);
+            Usuario usuario = await GetById(Id);
+            await _repository.Eliminar(usuario);
+            return usuario;
         }
 
         public Task<List<Usuario>> GetAll()
@@ -43,14 +46,28 @@ namespace Domain.Endpoint.Services
           return _repository.Get(); 
         }
 
-        public void ModificarUsuario(Guid Id, UsuarioDTO cambioUsuario)
+        public async Task<Usuario> ModificarUsuario(Guid Id, UsuarioDTO cambioUsuario)
         {
-            _repository.ModificarUsuario(Id, cambioUsuario);
+            //_repository.ModificarUsuario(Id, cambioUsuario);
+            Usuario usuario = await GetById(Id);
+
+            Usuario newUsuario = new Usuario
+            {
+                Id = usuario.Id,
+                NombreUsuario=cambioUsuario.NombreUsuario,
+                Contraseña=cambioUsuario.Contraseña,
+                IdEmpleado=cambioUsuario.IdEmpleado,
+                IdRol=cambioUsuario.IdRol,
+                
+            };
+
+            await _repository.ModificarUsuario(newUsuario);
+            return newUsuario;
         }
 
-        public Usuario GetById(Guid Id)
+        public async Task<Usuario> GetById(Guid Id)
         {
-            return _repository.GetById(Id);
+            return await _repository.GetById(Id);
         }
     }
 }

@@ -10,13 +10,13 @@ namespace Domain.Endpoint.Interfaces.Repositories
     {
         Task<List<Usuario>> Get();
 
-        Usuario GetById(Guid Id);
+        Task<Usuario> GetById(Guid Id);
 
         void Create(Usuario usuario);
 
-        void Eliminar(Guid Id);
+        Task Eliminar(Usuario usuario);
 
-        void ModificarUsuario(Guid Id, UsuarioDTO modificarUsuario);
+        Task ModificarUsuario(Usuario modificarUsuario);
 
     }
 }

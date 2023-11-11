@@ -1,86 +1,69 @@
 ﻿using Domain.Endpoint.Entities;
 using Domain.Endpoint.Interfaces.Repositories;
+using Infrastructure.Endpoint.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
+using static Infrastructure.Endpoint.Builders.SqlOperations;
 
 namespace Infrastructure.Endpoint.Data.Repositories
 {
     class RolRepository : IRolRepository
     {
+        private readonly ISqlCommandOperationBuilder _operationBuilder;
         private readonly ISingletonSqlConnection _connectionBuilder;
 
-        public RolRepository(ISingletonSqlConnection connectionBuilder)
+        public RolRepository(ISingletonSqlConnection connectionBuilder, ISqlCommandOperationBuilder operationBuilder)
         {
             _connectionBuilder = connectionBuilder;
+            _operationBuilder = operationBuilder;
         }
 
         public void Create(Rol rol)
         {
-            string insertQuery = "INSERT INTO ROLES (ID_ROLES,DESCRIPCION_ROLES) VALUES(@ID, @Descripcion)";
-            SqlCommand sqlCommand = _connectionBuilder.GetCommand(insertQuery);
-            SqlParameter[] parameters = new SqlParameter[]
-            {
-                new SqlParameter() {
-                    Direction = ParameterDirection.Input,
-                    ParameterName = "@ID",
-                    SqlDbType = SqlDbType.UniqueIdentifier,
-                    Value = rol.Id
-                },
-                new SqlParameter() {
-                    Direction = ParameterDirection.Input,
-                    ParameterName = "@Descripcion",
-                    SqlDbType = SqlDbType.NVarChar,
-                    Value = rol.DescripcionRol
-                }
-            };
-            sqlCommand.Parameters.AddRange(parameters);
-            sqlCommand.ExecuteNonQuery();
+            SqlCommand writeCommand = _operationBuilder.From(rol)
+                .WithOperation(SqlWriteOperation.Create)
+                .BuildWritter();
+            _connectionBuilder.ExecuteNonQueryCommandAsync(writeCommand);
         }
 
-        public void Eliminar(Guid Id)
+        public async Task Eliminar(Rol rol)
         {
-            string deleteQuery = "DELETE FROM ROLES WHERE ID_ROLES = @RolesId;";
-            SqlCommand sqlCommand = _connectionBuilder.GetCommand(deleteQuery);
-            SqlParameter parameter = new SqlParameter()
-            {
-                Direction = ParameterDirection.Input,
-                ParameterName = "@RolesId",
-                SqlDbType = SqlDbType.UniqueIdentifier,
-                Value = Id
-            };
-            sqlCommand.Parameters.Add(parameter);
-            sqlCommand.ExecuteNonQuery();
+            SqlCommand writeCommand = _operationBuilder.From(rol)
+               .WithOperation(SqlWriteOperation.Delete)
+               .BuildWritter();
+            await _connectionBuilder.ExecuteNonQueryCommandAsync(writeCommand);
         }
 
         public async Task<List<Rol>> Get()
         {
-            string query = "SELECT * FROM ROLES;";
-            DataTable dataTable = await _connectionBuilder.ExecuteQueryCommandAsync(query);
-            List<Rol> rol = dataTable.AsEnumerable()
-                .Select(MapEntityFromDataRow)
-                .ToList();
+            SqlCommand readCommand = _operationBuilder.Initialize<Rol>()
+                .WithOperation(SqlReadOperation.Select)
+                .BuildReader();
+            DataTable dt = await _connectionBuilder.ExecuteQueryCommandAsync(readCommand);
 
-            return rol;
+            List<Rol> roles = dt.AsEnumerable().Select(row =>
+            new Rol
+            {
+                Id = row.Field<Guid>("ID_ROLES"),
+                DescripcionRol = row.Field<string>("DESCRIPCION_ROLES"),
+            }).ToList();
+
+            return roles;
         }
 
-        public Rol GetById(Guid Id)
+        public async Task<Rol> GetById(Guid Id)
         {
-            Rol rol = null;
-            string getQuery = "SELECT * FROM ROLES WHERE ID_ROLES = @RolesId;";
-            SqlCommand sqlCommand = _connectionBuilder.GetCommand(getQuery);
-            SqlParameter parameter = new SqlParameter()
-            {
-                Direction = ParameterDirection.Input,
-                ParameterName = "@RolesId",
-                SqlDbType = SqlDbType.UniqueIdentifier,
-                Value = Id
-            };
-            sqlCommand.Parameters.Add(parameter);
-            SqlDataReader reader = sqlCommand.ExecuteReader();
+            SqlCommand readCommand = _operationBuilder.Initialize<Rol>()
+           .WithOperation(SqlReadOperation.SelectById)
+           .WithId(Id)
+           .BuildReader();
+            Rol rol = new Rol();
+            await _connectionBuilder.ExecuteQueryCommandAsync(readCommand);
+            SqlDataReader reader = readCommand.ExecuteReader();
             if (reader.Read())
             {
                 rol = new Rol
@@ -91,7 +74,6 @@ namespace Infrastructure.Endpoint.Data.Repositories
             }
             reader.Close();
             return rol;
-
         }
 
         private Rol MapEntityFromDataRow(DataRow row)

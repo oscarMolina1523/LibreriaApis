@@ -30,9 +30,12 @@ namespace Domain.Endpoint.Services
             return newRol;
         }
 
-        public void EliminarRol(Guid Id)
+        public async Task<Rol> EliminarRol(Guid Id)
         {
-            _repository.Eliminar(Id);
+            //_repository.Eliminar(Id);
+            Rol rol = await GetById(Id);
+            await _repository.Eliminar(rol);
+            return rol;
         }
 
         public Task<List<Rol>> GetAll()
@@ -40,9 +43,9 @@ namespace Domain.Endpoint.Services
             return _repository.Get();
         }
 
-        public Rol GetById(Guid Id)
+        public async Task<Rol> GetById(Guid Id)
         {
-            return _repository.GetById(Id);
+            return await _repository.GetById(Id);
         }
     }
 }

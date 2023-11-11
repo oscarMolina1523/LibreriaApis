@@ -10,12 +10,12 @@ namespace Domain.Endpoint.Interfaces.Services
     {
         Task<List<Usuario>> GetAll();
 
-        Usuario GetById(Guid Id);
+        Task<Usuario> GetById(Guid Id);
 
         Usuario CrearUsuario(UsuarioDTO nuevoUsuario);
 
-        void EliminarUsuario(Guid Id);
+        Task<Usuario> EliminarUsuario(Guid Id);
 
-        void ModificarUsuario(Guid Id, UsuarioDTO cambioUsuario);
+        Task<Usuario> ModificarUsuario(Guid Id, UsuarioDTO cambioUsuario);
     }
 }

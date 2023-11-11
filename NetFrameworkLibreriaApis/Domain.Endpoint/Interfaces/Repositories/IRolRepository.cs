@@ -9,10 +9,10 @@ namespace Domain.Endpoint.Interfaces.Repositories
     {
         Task<List<Rol>> Get();
 
-        Rol GetById(Guid Id);
+        Task<Rol> GetById(Guid Id);
 
         void Create(Rol rol);
 
-        void Eliminar(Guid Id);
+        Task Eliminar(Rol rol);
     }
 }

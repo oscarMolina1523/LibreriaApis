@@ -26,9 +26,9 @@ namespace WebApi.Controllers
         }
 
         [HttpGet]
-        public IHttpActionResult GetUsuarioById(Guid Id)
+        public async Task<IHttpActionResult> GetUsuarioById(Guid Id)
         {
-            Usuario usuario = _UsuarioService.GetById(Id);
+            Usuario usuario = await _UsuarioService.GetById(Id);
             return Ok(usuario);
         }
 
@@ -46,16 +46,16 @@ namespace WebApi.Controllers
         }
 
         [HttpDelete]
-        public IHttpActionResult Eliminar(Guid Id)
+        public async Task<IHttpActionResult> Eliminar(Guid Id)
         {
-            _UsuarioService.EliminarUsuario(Id);
+            await _UsuarioService.EliminarUsuario(Id);
             return Ok();
         }
 
         [HttpPut]
-        public IHttpActionResult modificarUsuario(Guid Id, UsuarioDTO nuevosCampos)
+        public async Task<IHttpActionResult> modificarUsuario(Guid Id, UsuarioDTO nuevosCampos)
         {
-            _UsuarioService.ModificarUsuario(Id, nuevosCampos);
+            await _UsuarioService.ModificarUsuario(Id, nuevosCampos);
             return Ok("El usuario ha sido modificado");
         }
 
